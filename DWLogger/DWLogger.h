@@ -9,11 +9,11 @@
 #ifndef DWLogger_h
 #define DWLogger_h
 
+#import "DWLogManager.h"
+
 #if DEBUG
 #define DevEvn//开发环境标识符
 #endif
-
-#import "DWLogManager.h"
 
 #ifdef DevEvn
 

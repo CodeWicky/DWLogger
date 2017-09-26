@@ -8,6 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
+    DWLoggerInfo = 1 << 0,
+    DWLoggerWarning = 1 << 1,
+    DWLoggerError = 1 << 2,
+    DWLoggerAll = DWLoggerInfo | DWLoggerWarning | DWLoggerError,
+};
+
 @interface DWLogManager : NSObject
 
 ///是否允许Logger收集日志，若不予许收集日志则相关功能均失效（默认为NO）
@@ -18,6 +25,8 @@
 
 ///是否自动备份日志至沙盒（默认为NO）
 @property (nonatomic ,assign) BOOL autoBackUp;
+
+@property (nonatomic ,assign) DWLoggerFilter logFilter;
 
 ///自动备份日志沙盒地址
 @property (nonatomic ,copy ,readonly) NSString * logFilePath;
