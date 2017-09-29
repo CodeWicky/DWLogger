@@ -17,6 +17,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [DWLogManager configDefaultLogger];
+    [DWLogManager configToCollectCrash];
     return YES;
 }
 

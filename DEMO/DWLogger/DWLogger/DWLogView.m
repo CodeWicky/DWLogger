@@ -329,6 +329,8 @@ static inline CGRect btnRectWithOrigin(CGFloat x,CGFloat y) {
 
 @end
 
+
+
 static DWFloatPot * pot = nil;
 @implementation DWFloatPot
 
@@ -394,6 +396,8 @@ static DWFloatPot * pot = nil;
 
 @end
 
+
+
 @interface DWlogCell : DWTableViewHelperCell
 
 @property (nonatomic ,strong) UILabel * logLb;
@@ -407,7 +411,7 @@ static DWFloatPot * pot = nil;
     self.logLb = [[UILabel alloc] init];
     self.logLb.numberOfLines = 0;
     [self.contentView addSubview:self.logLb];
-    self.logLb.textColor = [UIColor whiteColor];
+    self.logLb.textColor = [UIColor lightTextColor];
     self.backgroundColor = [UIColor clearColor];
     self.logLb.translatesAutoresizingMaskIntoConstraints = NO;
     NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:15];
@@ -468,6 +472,8 @@ static DWFloatPot * pot = nil;
 }
 
 @end
+
+
 
 static DWLogView * logger = nil;
 @implementation DWLogView

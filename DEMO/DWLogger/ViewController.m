@@ -21,7 +21,9 @@
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor redColor];
-//    NSLog(@"%@",[DWLogManager shareLogManager].logFilePath);
+    
+    DWLog(@"%@",[DWLogManager shareLogManager].logFilePath);
+    
 //    [DWLogManager shareLogManager].particularLog = YES;
 ////    [DWLogManager shareLogManager].disableLogger = YES;
 //    [DWLogManager shareLogManager].autoBackUp = YES;
@@ -51,6 +53,7 @@
     DWLogError(@"2.errer %d",2);
     DWLogWarning(@"3.%d - %d",1,2);
     DWLogInfo(@"%@",[UIApplication sharedApplication].windows);
+    [DWLogManager printCallStackSymbols];
 }
 
 -(void)aBtnAction:(UIButton *)sender

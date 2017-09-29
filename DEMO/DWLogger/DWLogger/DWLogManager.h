@@ -68,5 +68,11 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
 
 ///以过滤器和logView配置Logger
 +(void)configLoggerWithFilter:(DWLoggerFilter)filter needLogView:(BOOL)need;
+
+///打印当前调用栈信息
++(void)printCallStackSymbols;
+
+///收集崩溃日志
++(void)configToCollectCrash;
 @end
 

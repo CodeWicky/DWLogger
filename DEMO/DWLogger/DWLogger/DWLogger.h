@@ -6,6 +6,15 @@
 //  Copyright © 2017年 Wicky. All rights reserved.
 //
 
+/**
+ DWLogger
+ 日志扩展管理类
+ 
+ 提供Debug模式下的日志管理功能，Release模式下屏蔽日志输出及管理功能。
+ 提供不同日志输出等级，并提供手机端日志查看助手。
+ 提供日志备份及崩溃捕捉等功能
+ */
+
 #ifndef DWLogger_h
 #define DWLogger_h
 
@@ -80,7 +89,5 @@ logStr = [logStr stringByAppendingString:temp];\
 #define DWLogWithFilter(f,FORMAT, ...)
 
 #endif
-
-
 
 #endif /* DWLogger_h */

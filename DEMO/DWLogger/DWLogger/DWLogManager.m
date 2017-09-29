@@ -22,8 +22,6 @@ static DWLogManager * mgr = nil;
 
 @property (nonatomic ,strong) dispatch_queue_t writeFileQueue;
 
-
-
 @end
 
 @implementation DWLogManager
@@ -51,18 +49,19 @@ static DWLogManager * mgr = nil;
         DWLogModel * model = [DWLogModel new];
         
         NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:log];
-        NSRange r;
-        if (filter == DWLoggerInfo) {
-            r = [log rangeOfString:@"INFO"];
-            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor greenColor] range:r];
-        } else if (filter == DWLoggerWarning) {
-            r = [log rangeOfString:@"WARNING"];
-            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor yellowColor] range:r];
-        } else if (filter == DWLoggerError) {
-            r = [log rangeOfString:@"ERROR"];
-            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
+        if (logger.particularLog) {
+            NSRange r;
+            if (filter == DWLoggerInfo) {
+                r = [log rangeOfString:@"INFO"];
+                [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor greenColor] range:r];
+            } else if (filter == DWLoggerWarning) {
+                r = [log rangeOfString:@"WARNING"];
+                [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor yellowColor] range:r];
+            } else if (filter == DWLoggerError) {
+                r = [log rangeOfString:@"ERROR"];
+                [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
+            }
         }
-        
         model.logString = aStr;
         [[DWLogView loggerContainer] addObject:model];
         [DWLogView updateLog];
@@ -116,13 +115,43 @@ static DWLogManager * mgr = nil;
     }
 }
 
++(void)printCallStackSymbols {
+    DWLog(@"%@",[NSThread callStackSymbols]);
+}
+
++(void)configToCollectCrash {
+#ifndef DevEvn
+    return;
+#endif
+    NSSetUncaughtExceptionHandler(&exceptionHandler);
+}
+
+static void exceptionHandler(NSException *exception)
+{
+    NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyyMMdd-HHmmss"];
+    NSString * crashFileName = [formatter stringFromDate:[NSDate date]];
+    crashFileName = [crashFileName stringByAppendingString:@".crash"];
+    DWLogManager * logger = [DWLogManager shareLogManager];
+    NSString * path = logger.filePath;
+    path = [path stringByDeletingLastPathComponent];
+    path = [path stringByAppendingPathComponent:@"Crash"];
+    NSString * crashFilePath = [path stringByAppendingPathComponent:crashFileName];
+    [DWFileManager dw_CreateFileAtPath:crashFilePath];
+    [logger writeDataString2File:exception.debugDescription toPath:crashFilePath];
+}
+
 #pragma mark --- tool method ---
 -(void)writeLog2File:(NSString *)log {
     log = [log stringByAppendingString:@"\n"];
+    [self writeDataString2File:log toPath:self.logFilePath];
+}
+
+-(void)writeDataString2File:(NSString *)data toPath:(NSString *)path {
     dispatch_async(self.writeFileQueue, ^{
-        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:self.logFilePath];
+        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
         [file seekToEndOfFile];
-        [file writeData:[log dataUsingEncoding:NSUTF8StringEncoding]];
+        [file writeData:[data dataUsingEncoding:NSUTF8StringEncoding]];
         [file closeFile];
     });
 }
@@ -171,7 +200,7 @@ static DWLogManager * mgr = nil;
 -(NSString *)filePath {
     if (!_filePath) {
         _filePath = [NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-        _filePath = [_filePath stringByAppendingPathComponent:@"log"];
+        _filePath = [_filePath stringByAppendingPathComponent:@"Log"];
     }
     return _filePath;
 }
