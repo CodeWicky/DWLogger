@@ -126,9 +126,8 @@
 +(BOOL)dw_ClearDirectoryAtPath:(NSString *)path {
     NSArray *subFiles = [self dw_ListFilesInDirectoryAtPath:path deep:NO];
     BOOL isSuccess = YES;
-    
-    for (NSString *file in subFiles) {
-        NSString *absolutePath = [path stringByAppendingPathComponent:file];
+    for (DWFileManagerFile *file in subFiles) {
+        NSString *absolutePath = [path stringByAppendingPathComponent:file.fileName];
         isSuccess &= [self dw_RemoveItemAtPath:absolutePath];
     }
     return isSuccess;
