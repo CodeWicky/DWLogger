@@ -23,6 +23,8 @@
     self.view.backgroundColor = [UIColor redColor];
     
     DWLog(@"%@",[DWLogManager shareLogManager].logFilePath);
+    NSArray * arr = @[];
+    NSObject * o = arr[1];
     
 //    [DWLogManager shareLogManager].particularLog = YES;
 ////    [DWLogManager shareLogManager].disableLogger = YES;

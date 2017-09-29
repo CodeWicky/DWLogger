@@ -10,8 +10,9 @@
 #import "DWLogger.h"
 #import "DWFileManager.h"
 
-static DWLogManager * mgr = nil;
+#define FilePath [NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
 
+static DWLogManager * mgr = nil;
 @interface DWLogManager ()
 
 @property (nonatomic ,strong) NSMutableArray * logArr;
@@ -132,28 +133,16 @@ static void exceptionHandler(NSException *exception)
     [formatter setDateFormat:@"yyyyMMdd-HHmmss"];
     NSString * crashFileName = [formatter stringFromDate:[NSDate date]];
     crashFileName = [crashFileName stringByAppendingString:@".crash"];
-    DWLogManager * logger = [DWLogManager shareLogManager];
-    NSString * path = logger.filePath;
-    path = [path stringByDeletingLastPathComponent];
-    path = [path stringByAppendingPathComponent:@"Crash"];
+    NSString * path = [FilePath stringByAppendingPathComponent:@"Crash"];
     NSString * crashFilePath = [path stringByAppendingPathComponent:crashFileName];
     [DWFileManager dw_CreateFileAtPath:crashFilePath];
-    [logger writeDataString2File:exception.debugDescription toPath:crashFilePath];
+    writeDataString2File(exception.debugDescription, crashFilePath, dispatch_queue_create("com.crashQueue.DWLogManager", DISPATCH_QUEUE_SERIAL));
 }
 
 #pragma mark --- tool method ---
 -(void)writeLog2File:(NSString *)log {
     log = [log stringByAppendingString:@"\n"];
-    [self writeDataString2File:log toPath:self.logFilePath];
-}
-
--(void)writeDataString2File:(NSString *)data toPath:(NSString *)path {
-    dispatch_async(self.writeFileQueue, ^{
-        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-        [file seekToEndOfFile];
-        [file writeData:[data dataUsingEncoding:NSUTF8StringEncoding]];
-        [file closeFile];
-    });
+    writeDataString2File(log, self.logFilePath,self.writeFileQueue);
 }
 
 -(void)configLoggerView:(DWLogView *)logView {
@@ -186,6 +175,16 @@ static void exceptionHandler(NSException *exception)
     return self;
 }
 
+#pragma mark --- inline method ---
+static inline void writeDataString2File(NSString * data,NSString * path,dispatch_queue_t queue) {
+    dispatch_async(queue, ^{
+        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
+        [file seekToEndOfFile];
+        [file writeData:[data dataUsingEncoding:NSUTF8StringEncoding]];
+        [file closeFile];
+    });
+}
+
 #pragma mark --- setter/getter ---
 -(NSMutableArray *)logArr
 {
@@ -199,8 +198,7 @@ static void exceptionHandler(NSException *exception)
 
 -(NSString *)filePath {
     if (!_filePath) {
-        _filePath = [NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-        _filePath = [_filePath stringByAppendingPathComponent:@"Log"];
+        _filePath = [FilePath stringByAppendingPathComponent:@"Log"];
     }
     return _filePath;
 }
