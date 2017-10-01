@@ -50,18 +50,16 @@ static DWLogManager * mgr = nil;
         DWLogModel * model = [DWLogModel new];
         
         NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:log];
-        if (logger.particularLog) {
-            NSRange r;
-            if (filter == DWLoggerInfo) {
-                r = [log rangeOfString:@"INFO"];
-                [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor greenColor] range:r];
-            } else if (filter == DWLoggerWarning) {
-                r = [log rangeOfString:@"WARNING"];
-                [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor yellowColor] range:r];
-            } else if (filter == DWLoggerError) {
-                r = [log rangeOfString:@"ERROR"];
-                [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
-            }
+        NSRange r;
+        if (filter == DWLoggerInfo) {
+            r = [log rangeOfString:@"INFO"];
+            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor greenColor] range:r];
+        } else if (filter == DWLoggerWarning) {
+            r = [log rangeOfString:@"WARNING"];
+            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor yellowColor] range:r];
+        } else if (filter == DWLoggerError) {
+            r = [log rangeOfString:@"ERROR"];
+            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
         }
         model.logString = aStr;
         [[DWLogView loggerContainer] addObject:model];
@@ -215,6 +213,15 @@ static inline void writeDataString2File(NSString * data,NSString * path,dispatch
         _logFileName = [_logFileName stringByAppendingString:@".log"];
     }
     return _logFileName;
+}
+
+-(NSString *)projectName {
+    if (!_projectName) {
+        NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+        NSString *executableFile = [infoDictionary objectForKey:(NSString *)kCFBundleExecutableKey];
+        _projectName = executableFile;
+    }
+    return _projectName;
 }
 
 -(NSString *)logFilePath {

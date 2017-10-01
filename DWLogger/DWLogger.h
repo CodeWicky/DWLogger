@@ -19,6 +19,11 @@
  提供手机端日志查看助手
  提供日志备份及崩溃捕捉功能
  Release模式下屏蔽所有功能
+ 
+ version 1.0.1
+ 添加NSLog替换为DWLog的日志替换宏
+ DWLog中日志输出函数改为printf函数，防止NSLog宏的循环调用
+ 修复不选详细日志模式时模式前缀颜色失效问题
  */
 
 #ifndef DWLogger_h
@@ -29,6 +34,14 @@
 
 #if DEBUG
 #define DevEvn//开发环境标识符
+#endif
+
+#ifndef ReplaceSystemLog
+#define ReplaceSystemLog///替换NSLog日志标识符，若无需替换系统日志，注释掉此宏定义
+#endif
+
+#ifdef ReplaceSystemLog
+#define NSLog(...) DWLog(__VA_ARGS__)
 #endif
 
 #define DWLog(...) \
@@ -73,17 +86,19 @@ prefix = @"";\
 break;\
 }\
 temp = [prefix stringByAppendingString:temp];\
-if (logger.logFilter & f) {\
-NSLog(@"%@",temp);\
-}\
-if (!logger.disableLogger) {\
 NSString * logStr = @"";\
-if (logger.particularLog) {\
 NSString * timeStr = [logger.timeFormatter stringFromDate:[NSDate date]];\
 logStr = [logStr stringByAppendingString:timeStr];\
+logStr = [logStr stringByAppendingString:[NSString stringWithFormat:@" %@",logger.projectName]];\
 NSString * file = [[NSString stringWithUTF8String:__FILE__] lastPathComponent];\
-logStr = [logStr stringByAppendingString:[NSString stringWithFormat:@" [%@",file]];\
+logStr = [logStr stringByAppendingString:[NSString stringWithFormat:@"[%@",file]];\
 logStr = [logStr stringByAppendingString:[NSString stringWithFormat:@" line:%d method:%@] ",__LINE__,NSStringFromSelector(_cmd)]];\
+if (logger.logFilter & f) {\
+printf("%s%s\n",[logStr cStringUsingEncoding:NSUTF8StringEncoding],[temp cStringUsingEncoding:NSUTF8StringEncoding]);\
+}\
+if (!logger.disableLogger) {\
+if (!logger.particularLog) {\
+logStr = @"";\
 }\
 logStr = [logStr stringByAppendingString:temp];\
 [DWLogManager addLog:logStr filter:f];\
