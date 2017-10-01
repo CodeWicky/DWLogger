@@ -45,9 +45,7 @@
 //    [image addSubview:button];
 //    [button addTarget: self action:@selector(aBtnAction:) forControlEvents:(UIControlEventTouchUpInside)];
     
-    
-    
-    DWLog(@"asd %d",543);
+    NSLog(@"asd %d",543);
     DWLog(@"asd");
     DWLogInfo(@"1.%@", @"asd");
     DWLogError(@"2.errer %d",2);

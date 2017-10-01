@@ -404,7 +404,10 @@ static DWFloatPot * pot = nil;
     UIView * view = [super hitTest:point withEvent:event];
     if ([view isEqual:self.rootViewController.view]) {
         DWFloatPotViewController * vc = (DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController;
-        [vc hideCheckView];
+        if (vc.checkIsShowing) {
+            [vc hideCheckView];
+            return view;
+        }
         return nil;
     }
     return view;
