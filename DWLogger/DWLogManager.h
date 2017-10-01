@@ -72,6 +72,9 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
 ///打印当前调用栈信息
 +(void)printCallStackSymbols;
 
+///打印Logger的文件主目录
++(void)printLoggerMainPath;
+
 ///收集崩溃日志
 +(void)configToCollectCrash;
 @end

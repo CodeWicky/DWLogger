@@ -120,6 +120,10 @@ static DWLogManager * mgr = nil;
     DWLog(@"%@",[NSThread callStackSymbols]);
 }
 
++(void)printLoggerMainPath {
+    DWLog(@"%@",FilePath);
+}
+
 +(void)configToCollectCrash {
 #ifndef DevEvn
     return;

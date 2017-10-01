@@ -7,7 +7,6 @@
 //
 
 #import "DWLogView.h"
-#import "AppDelegate.h"
 #import "DWLogger.h"
 #import "DWCheckBox.h"
 #import "DWOperationCancelFlag.h"
@@ -21,6 +20,8 @@
 @property (nonatomic ,assign) CGFloat width;
 
 @property (nonatomic ,assign) CGFloat height;
+
+@property (nonatomic ,strong) UIView * containerView;
 
 @property (nonatomic ,strong) UIButton * switchBtn;
 
@@ -54,6 +55,11 @@
     CGRect switchBtnR = btnRectWithOrigin(width - BtnLength,height - BtnLength - 30);
     CGRect tempFrm = btnRectWithOrigin(width - BtnLength, switchBtnR.origin.y);
     
+    self.containerView = [[UIView alloc] initWithFrame:switchBtnR];
+    self.containerView.backgroundColor = [UIColor blackColor];
+    self.containerView.layer.cornerRadius = BtnLength / 2.0;
+    [self.view addSubview:self.containerView];
+    
     self.modeBtn = normalBtn(image(@"log"), image(@"close"), self, @selector(modeBtnAction:), tempFrm);
     self.clearLogBtn = normalBtn(image(@"clear"), nil, self, @selector(clearBtnAction:), tempFrm);
     [self.clearLogBtn setBackgroundImage:image(@"destroy") forState:(UIControlStateHighlighted)];
@@ -81,6 +87,7 @@
     CGPoint p = [sender locationInView:self.view];
     if (p.x > BtnLength / 2.0 && p.y > BtnLength / 2.0 && self.width - p.x > BtnLength / 2.0 && self.height - p.y > BtnLength / 2.0) {
         self.switchBtn.center = p;
+        self.containerView.center = p;
         if (sender.state == UIGestureRecognizerStateEnded) {
             [self gotoSideAnimationFromPoint:p];
         }
@@ -89,20 +96,23 @@
 
 -(void)gotoSideAnimationFromPoint:(CGPoint)p {
     CGFloat oriX = p.x;
-    CGFloat tempX = self.width;
+    CGFloat tempX = 0;
     if (p.x < self.view.center.x) {
         p = CGPointMake(BtnLength / 2.0, p.y);
-        tempX = -BtnLength;
+        tempX = 0;
     } else {
         p = CGPointMake(self.width - BtnLength / 2.0, p.y);
+        tempX = self.width - BtnLength;
     }
     CGRect tempFrm = btnRectWithOrigin(tempX, p.y - BtnLength / 2.0);
     for (UIView * v in self.itemsArr) {
         v.frame = tempFrm;
     }
     CGFloat time = ABS(oriX - p.x) / SpeedScale;
+    self.containerView.frame = self.switchBtn.frame;
     [UIView animateWithDuration:time animations:^{
         self.switchBtn.center = p;
+        self.containerView.center = p;
     }];
 }
 
@@ -165,11 +175,11 @@
 #pragma mark --- tool method ---
 -(void)showItems {
     CGFloat x;
-    CGRect frame;
-    CGFloat time;
-    CGFloat delta;
-    CGFloat length;
-    CGFloat factor;
+    CGRect frame = CGRectNull;
+    CGFloat time = 0;
+    CGFloat delta = 0;
+    CGFloat length = 0;
+    CGFloat factor = 0;
     if ([DWLogView shareLogView].isShowing) {
         self.interactionBtn.selected = [DWLogView shareLogView].interactionEnabled;
     } else {
@@ -195,6 +205,18 @@
             v.alpha = 1;
         } completion:nil];
     }
+    CGFloat x1 = 0;
+    CGFloat x2 = 0;
+    if (self.switchBtn.center.x > self.view.center.x) {
+        x1 = self.containerView.frame.origin.x + self.containerView.frame.size.width;
+        x2 = frame.origin.x;
+    } else {
+        x1 = frame.origin.x + frame.size.width;
+        x2 = self.containerView.frame.origin.x;
+    }
+    [UIView animateWithDuration:time delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+        self.containerView.frame = CGRectMake(x2, self.switchBtn.center.y - BtnLength / 2.0, ABS(x1 - x2), BtnLength);
+    } completion:nil];
 }
 
 -(void)hideItems {
@@ -221,6 +243,11 @@
             v.alpha = 0;
         } completion:nil];
     }
+    
+    x = self.switchBtn.center.x - BtnLength / 2.0;
+    [UIView animateWithDuration:totalTime delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+        self.containerView.frame = CGRectMake(x, self.containerView.frame.origin.y, BtnLength, BtnLength);
+    } completion:nil];
 }
 
 -(void)showCheckView {
@@ -341,9 +368,8 @@ static DWFloatPot * pot = nil;
 #else
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        AppDelegate * delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-        pot = [[DWFloatPot alloc] initWithFrame:delegate.window.bounds];
-        pot.windowLevel = UIWindowLevelNormal + 2;
+        pot = [[DWFloatPot alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        pot.windowLevel = UIWindowLevelAlert + 2;
         pot.backgroundColor = [UIColor clearColor];
         pot.hidden = NO;
         pot.rootViewController = [DWFloatPotViewController new];
@@ -485,9 +511,8 @@ static DWLogView * logger = nil;
 #else
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        AppDelegate * delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-        logger = [[DWLogView alloc] initWithFrame:delegate.window.bounds];
-        logger.windowLevel = UIWindowLevelNormal + 1;
+        logger = [[DWLogView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        logger.windowLevel = UIWindowLevelAlert + 1;
         logger.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
         logger.hidden = NO;
         logger.alpha = 0;
