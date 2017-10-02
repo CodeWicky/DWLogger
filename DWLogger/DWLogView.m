@@ -7,9 +7,10 @@
 //
 
 #import "DWLogView.h"
-#import "DWLogger.h"
 #import "DWCheckBox.h"
-#import "DWOperationCancelFlag.h"
+#import "DWLogger.h"
+#import "NSArray+DWArrayUtils.h"
+#import "UIView+DWViewUtils.h"
 
 #define BtnLength 44
 #define BtnSpacing 20
@@ -43,13 +44,389 @@
 
 @property (nonatomic ,assign) BOOL checkIsShowing;
 
+-(void)hideCheckView;
+
 @end
+
+
+
+@interface DWLogViewController : UIViewController<UISearchResultsUpdating>
+
+@property (nonatomic ,strong) UITableView * mainTab;
+
+@property (nonatomic ,strong) DWTableViewHelper * helper;
+
+@property (nonatomic ,strong) NSMutableArray * dataArr;
+
+@property (nonatomic ,strong) NSMutableArray * filterLogArray;
+
+@property (nonatomic ,assign) BOOL filterLogArrayNeedChange;
+
+@property (nonatomic ,strong) UISearchController * searchController;
+
+@property (nonatomic ,strong) NSMutableArray * searchArray;
+
+@end
+
+
+
+static DWFloatPot * pot = nil;
+@implementation DWFloatPot
+
+#pragma mark --- interface method ---
++(instancetype)sharePot {
+#ifndef DevEvn
+    return nil;
+#else
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        pot = [[DWFloatPot alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        pot.windowLevel = UIWindowLevelAlert + 2;
+        pot.backgroundColor = [UIColor clearColor];
+        pot.hidden = NO;
+        pot.rootViewController = [DWFloatPotViewController new];
+    });
+    return pot;
+#endif
+}
+
+#pragma mark --- singleton ---
++(instancetype)allocWithZone:(struct _NSZone *)zone {
+#ifndef DevEvn
+    return nil;
+#else
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        pot = [super allocWithZone:zone];
+    });
+    return pot;
+#endif
+}
+
+-(instancetype)copyWithZone:(struct _NSZone *)zone {
+    return self;
+}
+
+-(instancetype)mutableCopyWithZone:(struct _NSZone *)zone {
+    return self;
+}
+
+#pragma mark --- overwrite ---
+-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView * view = [super hitTest:point withEvent:event];
+    if ([view isEqual:self.rootViewController.view]) {///当前响应者为FloatView的rootViewController的根视图
+        DWFloatPotViewController * vc = (DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController;
+        if (vc.checkIsShowing) {///如果有展示checkView的话收起checkView，此时应该是FloatView所属window响应
+            [vc hideCheckView];
+            return view;
+        }
+        DWLogViewController * logVC = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+        if (logVC.searchController.searchBar.isFirstResponder) {///如果处于搜索状态，应该释放搜索栏的第一响应者，此时应该是FloatView所属window响应
+            [logVC.searchController.searchBar resignFirstResponder];
+            return view;
+        }
+        return nil;///否则没有点击到FloatPot的按钮，应该LogView应该不做响应
+    }
+    return view;///返回不为根视图，则有可能为nil或者FloatView的button。
+}
+@end
+
+@implementation DWLogModel
+
+-(instancetype)init {
+    if (self = [super init]) {
+        self.cellClassStr = @"DWlogCell";
+    }
+    return self;
+}
+
+@end
+
+
+
+@interface DWlogCell : DWTableViewHelperCell
+
+@property (nonatomic ,strong) UILabel * logLb;
+
+@end
+
+@implementation DWlogCell
+
+-(void)setupUI {
+    [super setupUI];
+    self.logLb = [[UILabel alloc] init];
+    self.logLb.numberOfLines = 0;
+    [self.contentView addSubview:self.logLb];
+    self.logLb.textColor = [UIColor lightTextColor];
+    self.backgroundColor = [UIColor clearColor];
+    self.logLb.translatesAutoresizingMaskIntoConstraints = NO;
+    NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:15];
+    NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeRight multiplier:1.0 constant:-15];
+    NSLayoutConstraint *upConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
+    NSLayoutConstraint *downConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-15];
+    [self.contentView addConstraint:leftConstraint];
+    [self.contentView addConstraint:rightConstraint];
+    [self.contentView addConstraint:upConstraint];
+    [self.contentView addConstraint:downConstraint];
+}
+
+-(void)setModel:(DWLogModel *)model {
+    [super setModel:model];
+    self.logLb.attributedText = model.logString;
+}
+
+@end
+
+
+
+@implementation DWLogViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self.view addSubview:self.searchController.searchBar];
+    [self.view addSubview:self.mainTab];
+    if ([UIScrollView instancesRespondToSelector:NSSelectorFromString(@"setContentInsetAdjustmentBehavior:")]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        [self.mainTab performSelector:NSSelectorFromString(@"setContentInsetAdjustmentBehavior:") withObject:@(2)];
+#pragma clang diagnostic pop
+    } else {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
+}
+
+#pragma mark --- UISearchResultsUpdating ---
+-(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    NSMutableArray * oriArr = self.filterLogArray ? : self.dataArr;
+    oriArr = [self filterSearchArray:oriArr];
+    self.helper.dataSource = oriArr;
+    [self.helper reloadDataWithCompletion:nil];
+}
+
+-(NSMutableArray *)filterSearchArray:(NSMutableArray *)array {
+    NSString * conditionString = self.searchController.searchBar.text;
+    if (!conditionString.length) {
+        return array;
+    }
+    return [[array dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
+        return [obj.absoluteLog containsString:conditionString];
+    }] mutableCopy];
+}
+
+#pragma mark --- setter/getter ---
+-(UITableView *)mainTab {
+    if (!_mainTab) {
+        _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, self.searchController.searchBar.height, self.view.width, self.view.height - self.searchController.searchBar.height) style:(UITableViewStylePlain)];
+        self.helper = [[DWTableViewHelper alloc] initWithTabV:_mainTab dataSource:self.dataArr];
+        self.helper.useAutoRowHeight = YES;
+        _mainTab.backgroundColor = [UIColor clearColor];
+        _mainTab.showsVerticalScrollIndicator = NO;
+        _mainTab.showsHorizontalScrollIndicator = NO;
+        _mainTab.separatorStyle = UITableViewCellSeparatorStyleNone;
+    }
+    return _mainTab;
+}
+
+-(NSMutableArray *)dataArr
+{
+    if (!_dataArr) {
+        _dataArr = [NSMutableArray array];
+    }
+    return _dataArr;
+}
+
+-(NSMutableArray *)searchArray
+{
+    if (!_searchArray) {
+        _searchArray = [NSMutableArray array];
+    }
+    return _searchArray;
+}
+
+-(UISearchController *)searchController {
+    if (!_searchController) {
+        _searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+        _searchController.searchResultsUpdater = self;
+        _searchController.hidesNavigationBarDuringPresentation = NO;
+        _searchController.dimsBackgroundDuringPresentation = NO;
+        _searchController.obscuresBackgroundDuringPresentation = NO;
+//        _searchController.active = YES;
+    }
+    return _searchController;
+}
+
+@end
+
+
+
+static DWLogView * loggerView = nil;
+@implementation DWLogView
+
+#pragma mark --- interface method ---
++(instancetype)shareLogView {
+#ifndef DevEvn
+    return nil;
+#else
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        loggerView = [[DWLogView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        loggerView.windowLevel = UIWindowLevelAlert + 1;
+        loggerView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
+        loggerView.hidden = NO;
+        loggerView.alpha = 0;
+        loggerView.userInteractionEnabled = NO;
+        loggerView.rootViewController = [DWLogViewController new];
+    });
+    return loggerView;
+#endif
+}
+
++(void)enableUserInteraction {
+    [DWLogView shareLogView].userInteractionEnabled = YES;
+    if ([DWLogView shareLogView].isShowing) {
+        ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = YES;
+    }
+}
+
++(void)disableUserInteraction {
+    [DWLogView shareLogView].userInteractionEnabled = NO;
+    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = NO;
+}
+
++(void)showLogView {
+    [DWLogView shareLogView].hidden = NO;
+    [UIView animateWithDuration:0.4 animations:^{
+        [DWLogView shareLogView].alpha = 1;
+    }];
+    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = YES;
+    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = [DWLogView shareLogView].interactionEnabled;
+}
+
++(void)hideLogView {
+    [UIView animateWithDuration:0.4 animations:^{
+        [DWLogView shareLogView].alpha = 0;
+    } completion:^(BOOL finished) {
+        [DWLogView shareLogView].hidden = YES;
+    }];
+    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = NO;
+    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = NO;
+}
+
++(void)configDefaultLogView {
+    [DWLogView shareLogView];
+    [DWLogView enableUserInteraction];
+    [DWFloatPot sharePot];
+}
+
++(NSMutableArray *)loggerContainer {
+    return ((DWLogViewController *)[DWLogView shareLogView].rootViewController).dataArr;
+}
+
++(void)updateLog:(DWLogModel *)logModel filter:(DWLoggerFilter)filter {
+    DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+    if (vc.filterLogArrayNeedChange) {///保证filterLogArray完整，后再以搜索条件过滤搜索数组，再刷新
+        if (filter == DWLoggerIgnore) {
+            NSMutableArray * tempArr = [self filterAllArr:vc.dataArr];
+            vc.filterLogArray = tempArr;
+            tempArr = [vc filterSearchArray:tempArr];
+            vc.helper.dataSource = tempArr;
+        } else if (filter == DWLoggerAll) {
+            vc.helper.dataSource = [vc filterSearchArray:vc.dataArr];
+            vc.filterLogArray = nil;
+        } else {
+            NSMutableArray * tempArr = [self filterDataArr:vc.dataArr filter:filter];
+            vc.filterLogArray = tempArr;
+            tempArr = [vc filterSearchArray:tempArr];
+            vc.helper.dataSource = tempArr;
+        }
+        NSUInteger count = vc.helper.dataSource.count;
+        UITableView * tab = vc.mainTab;
+        [vc.helper reloadDataWithCompletion:^{
+            if (count == 0) {
+                return;
+            }
+            NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
+            [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
+        }];
+        vc.filterLogArrayNeedChange = NO;
+        return;
+    }
+    
+    NSUInteger count = vc.dataArr.count;
+    UITableView * tab = vc.mainTab;
+    if (vc.filterLogArray) {
+        if (logModel && filter & [DWLogManager shareLogManager].logFilter) {
+            [vc.filterLogArray addObject:logModel];
+            count = vc.filterLogArray.count;
+            [vc.helper reloadDataWithCompletion:^{
+                if (count == 0) {
+                    return;
+                }
+                NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
+                [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
+            }];
+        }
+        return;
+    }
+    [vc.helper reloadDataWithCompletion:^{
+        if (count == 0) {
+            return;
+        }
+        NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
+        [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
+    }];
+}
+
++(NSMutableArray *)filterDataArr:(NSArray <DWLogModel *>*)dataArr filter:(DWLoggerFilter)filter {
+    return [[dataArr dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
+        return obj.filter & filter;
+    }] mutableCopy];
+}
+
++(NSMutableArray *)filterAllArr:(NSArray <DWLogModel *>*)allArr {
+    return [[allArr dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
+        return obj.filter == DWLoggerAll;
+    }] mutableCopy];
+}
+
+#pragma mark --- singleton ---
++(instancetype)allocWithZone:(struct _NSZone *)zone {
+#ifndef DevEvn
+    return nil;
+#else
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        loggerView = [super allocWithZone:zone];
+    });
+    return loggerView;
+#endif
+}
+
+-(instancetype)copyWithZone:(struct _NSZone *)zone {
+    return self;
+}
+
+-(instancetype)mutableCopyWithZone:(struct _NSZone *)zone {
+    return self;
+}
+
+#pragma mark --- setter/getter ---
+-(BOOL)isShowing {
+    return ![DWLogView shareLogView].hidden && [DWLogView shareLogView].alpha;
+}
+
+-(BOOL)interactionEnabled {
+    return self.userInteractionEnabled;
+}
+@end
+
+
 
 @implementation DWFloatPotViewController
 
 -(void)viewDidLoad {
-    self.width = self.view.bounds.size.width;
-    self.height = self.view.bounds.size.height;
+    self.width = self.view.width;
+    self.height = self.view.height;
     CGFloat width = self.width;
     CGFloat height = self.height;
     CGRect switchBtnR = btnRectWithOrigin(width - BtnLength,height - BtnLength - 30);
@@ -157,7 +534,9 @@
 -(void)clearBtnAction:(UIButton *)sender
 {
     [DWLogManager clearCurrentLog];
-    [DWLogView updateLog];
+    DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+    [vc.filterLogArray removeAllObjects];
+    [vc.helper reloadDataWithCompletion:nil];
 }
 
 -(void)modeBtnAction:(UIButton *)sender
@@ -208,11 +587,11 @@
     CGFloat x1 = 0;
     CGFloat x2 = 0;
     if (self.switchBtn.center.x > self.view.center.x) {
-        x1 = self.containerView.frame.origin.x + self.containerView.frame.size.width;
+        x1 = self.containerView.right;
         x2 = frame.origin.x;
     } else {
-        x1 = frame.origin.x + frame.size.width;
-        x2 = self.containerView.frame.origin.x;
+        x1 = CGRectGetMaxX(frame);
+        x2 = self.containerView.left;
     }
     [UIView animateWithDuration:time delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
         self.containerView.frame = CGRectMake(x2, self.switchBtn.center.y - BtnLength / 2.0, ABS(x1 - x2), BtnLength);
@@ -246,7 +625,7 @@
     
     x = self.switchBtn.center.x - BtnLength / 2.0;
     [UIView animateWithDuration:totalTime delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
-        self.containerView.frame = CGRectMake(x, self.containerView.frame.origin.y, BtnLength, BtnLength);
+        self.containerView.frame = CGRectMake(x, self.containerView.originY, BtnLength, BtnLength);
     } completion:nil];
 }
 
@@ -260,7 +639,7 @@
     CGFloat y = self.modeBtn.frame.origin.y - 10 - 80;
     if (self.modeBtn.center.y < self.view.center.y) {
         upwards = NO;
-        y = self.modeBtn.frame.origin.y + self.modeBtn.frame.size.height + 10;
+        y = self.modeBtn.bottom + 10;
     }
     CGFloat x = self.modeBtn.center.x - self.checkView.bounds.size.width / 2.0;
     CGFloat tempY = self.modeBtn.frame.origin.y - 10;
@@ -283,7 +662,7 @@
     CGFloat x = self.modeBtn.center.x - self.checkView.bounds.size.width / 2.0;
     BOOL upwards = YES;
     if (self.modeBtn.center.y < self.view.center.y) {
-        y = self.modeBtn.frame.origin.y + self.modeBtn.frame.size.height + 10;
+        y = self.modeBtn.bottom + 10;
         upwards = NO;
     }
     [UIView animateWithDuration:0.4 animations:^{
@@ -300,7 +679,12 @@
     if ([select containsObject:@2]) {
         filter |= DWLoggerError;
     }
-    [DWLogManager shareLogManager].logFilter = filter;
+    DWLogManager * logger = [DWLogManager shareLogManager];
+    if (filter != logger.logFilter) {
+        logger.logFilter = filter;
+        ((DWLogViewController *)[DWLogView shareLogView].rootViewController).filterLogArrayNeedChange = YES;
+        [DWLogView updateLog:nil filter:filter];
+    }
 }
 
 #pragma mark --- setter/getter ---
@@ -354,259 +738,4 @@ static inline CGRect btnRectWithOrigin(CGFloat x,CGFloat y) {
     return (CGRect){CGPointMake(x, y),CGSizeMake(BtnLength, BtnLength)};
 }
 
-@end
-
-
-
-static DWFloatPot * pot = nil;
-@implementation DWFloatPot
-
-#pragma mark --- interface method ---
-+(instancetype)sharePot {
-#ifndef DevEvn
-    return nil;
-#else
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        pot = [[DWFloatPot alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        pot.windowLevel = UIWindowLevelAlert + 2;
-        pot.backgroundColor = [UIColor clearColor];
-        pot.hidden = NO;
-        pot.rootViewController = [DWFloatPotViewController new];
-    });
-    return pot;
-#endif
-}
-
-#pragma mark --- singleton ---
-+(instancetype)allocWithZone:(struct _NSZone *)zone {
-#ifndef DevEvn
-    return nil;
-#else
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        pot = [super allocWithZone:zone];
-    });
-    return pot;
-#endif
-}
-
--(instancetype)copyWithZone:(struct _NSZone *)zone {
-    return self;
-}
-
--(instancetype)mutableCopyWithZone:(struct _NSZone *)zone {
-    return self;
-}
-
-#pragma mark --- overwrite ---
--(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    UIView * view = [super hitTest:point withEvent:event];
-    if ([view isEqual:self.rootViewController.view]) {
-        DWFloatPotViewController * vc = (DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController;
-        if (vc.checkIsShowing) {
-            [vc hideCheckView];
-            return view;
-        }
-        return nil;
-    }
-    return view;
-}
-@end
-
-@implementation DWLogModel
-
--(instancetype)init {
-    if (self = [super init]) {
-        self.cellClassStr = @"DWlogCell";
-    }
-    return self;
-}
-
-@end
-
-
-
-@interface DWlogCell : DWTableViewHelperCell
-
-@property (nonatomic ,strong) UILabel * logLb;
-
-@end
-
-@implementation DWlogCell
-
--(void)setupUI {
-    [super setupUI];
-    self.logLb = [[UILabel alloc] init];
-    self.logLb.numberOfLines = 0;
-    [self.contentView addSubview:self.logLb];
-    self.logLb.textColor = [UIColor lightTextColor];
-    self.backgroundColor = [UIColor clearColor];
-    self.logLb.translatesAutoresizingMaskIntoConstraints = NO;
-    NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:15];
-    NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeRight multiplier:1.0 constant:-15];
-    NSLayoutConstraint *upConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
-    NSLayoutConstraint *downConstraint = [NSLayoutConstraint constraintWithItem:self.logLb attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-15];
-    [self.contentView addConstraint:leftConstraint];
-    [self.contentView addConstraint:rightConstraint];
-    [self.contentView addConstraint:upConstraint];
-    [self.contentView addConstraint:downConstraint];
-}
-
--(void)setModel:(DWLogModel *)model {
-    [super setModel:model];
-    self.logLb.attributedText = model.logString;
-}
-
-@end
-
-
-
-@interface DWLogViewController : UIViewController
-
-@property (nonatomic ,strong) UITableView * mainTab;
-
-@property (nonatomic ,strong) DWTableViewHelper * helper;
-
-@property (nonatomic ,strong) NSMutableArray * dataArr;
-
-@end
-
-@implementation DWLogViewController
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self.view addSubview:self.mainTab];
-}
-
--(UITableView *)mainTab {
-    if (!_mainTab) {
-        _mainTab = [[UITableView alloc] initWithFrame:self.view.bounds style:(UITableViewStylePlain)];
-        self.helper = [[DWTableViewHelper alloc] initWithTabV:_mainTab dataSource:self.dataArr];
-        self.helper.useAutoRowHeight = YES;
-        _mainTab.backgroundColor = [UIColor clearColor];
-        _mainTab.showsVerticalScrollIndicator = NO;
-        _mainTab.showsHorizontalScrollIndicator = NO;
-        _mainTab.separatorStyle = UITableViewCellSeparatorStyleNone;
-    }
-    return _mainTab;
-}
-
--(NSMutableArray *)dataArr
-{
-    if (!_dataArr) {
-        _dataArr = [NSMutableArray array];
-    }
-    return _dataArr;
-}
-
-@end
-
-
-
-static DWLogView * logger = nil;
-@implementation DWLogView
-
-#pragma mark --- interface method ---
-+(instancetype)shareLogView {
-#ifndef DevEvn
-    return nil;
-#else
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        logger = [[DWLogView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        logger.windowLevel = UIWindowLevelAlert + 1;
-        logger.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
-        logger.hidden = NO;
-        logger.alpha = 0;
-        logger.userInteractionEnabled = NO;
-        logger.rootViewController = [DWLogViewController new];
-    });
-    return logger;
-#endif
-}
-
-+(void)enableUserInteraction {
-    [DWLogView shareLogView].userInteractionEnabled = YES;
-    if ([DWLogView shareLogView].isShowing) {
-        ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = YES;
-    }
-}
-
-+(void)disableUserInteraction {
-    [DWLogView shareLogView].userInteractionEnabled = NO;
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = NO;
-}
-
-+(void)showLogView {
-    [DWLogView shareLogView].hidden = NO;
-    [UIView animateWithDuration:0.4 animations:^{
-        [DWLogView shareLogView].alpha = 1;
-    }];
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = YES;
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = [DWLogView shareLogView].interactionEnabled;
-}
-
-+(void)hideLogView {
-    [UIView animateWithDuration:0.4 animations:^{
-        [DWLogView shareLogView].alpha = 0;
-    } completion:^(BOOL finished) {
-        [DWLogView shareLogView].hidden = YES;
-    }];
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = NO;
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = NO;
-}
-
-+(void)configDefaultLogView {
-    [DWLogView shareLogView];
-    [DWLogView enableUserInteraction];
-    [DWFloatPot sharePot];
-}
-
-+(NSMutableArray *)loggerContainer {
-    return ((DWLogViewController *)[DWLogView shareLogView].rootViewController).dataArr;
-}
-
-+(void)updateLog {
-    DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
-    UITableView * tab = vc.mainTab;
-    NSUInteger count = vc.dataArr.count;
-    [vc.helper reloadDataWithCompletion:^{
-        if (count == 0) {
-            return;
-        }
-        NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
-        [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
-    }];
-}
-
-#pragma mark --- singleton ---
-+(instancetype)allocWithZone:(struct _NSZone *)zone {
-#ifndef DevEvn
-    return nil;
-#else
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        logger = [super allocWithZone:zone];
-    });
-    return logger;
-#endif
-}
-
--(instancetype)copyWithZone:(struct _NSZone *)zone {
-    return self;
-}
-
--(instancetype)mutableCopyWithZone:(struct _NSZone *)zone {
-    return self;
-}
-
-#pragma mark --- setter/getter ---
--(BOOL)isShowing {
-    return ![DWLogView shareLogView].hidden && [DWLogView shareLogView].alpha;
-}
-
--(BOOL)interactionEnabled {
-    return self.userInteractionEnabled;
-}
 @end

@@ -8,11 +8,27 @@
 
 #import <UIKit/UIKit.h>
 #import "DWTableViewHelper.h"
+#import "DWLogManager.h"
+
+@interface DWLogModel : DWTableViewHelperModel
+
+///组装完成的全部Log字符串
+@property (nonatomic ,strong) NSAttributedString * logString;
+
+///纯输出的日志
+@property (nonatomic ,copy) NSString * absoluteLog;
+
+///当前日志对应类型
+@property (nonatomic ,assign) DWLoggerFilter filter;
+
+@end
 
 @interface DWLogView : UIWindow
 
+///LogView是否正在展示
 @property (nonatomic ,assign ,readonly) BOOL isShowing;
 
+///LogView是否允许交互
 @property (nonatomic ,assign ,readonly) BOOL interactionEnabled;
 
 ///单例方法
@@ -37,18 +53,12 @@
 +(NSMutableArray *)loggerContainer;
 
 ///更新日志
-+(void)updateLog;
++(void)updateLog:(DWLogModel *)logModel filter:(DWLoggerFilter)filter;
 @end
 
 @interface DWFloatPot : UIWindow;
 
 ///单例方法
 +(instancetype)sharePot;
-
-@end
-
-@interface DWLogModel : DWTableViewHelperModel
-
-@property (nonatomic ,copy) NSAttributedString * logString;
 
 @end

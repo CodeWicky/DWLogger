@@ -12,6 +12,8 @@
 
 #define FilePath [NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
 
+#define NSRangeNull NSMakeRange(MAXFLOAT, MAXFLOAT)
+
 static DWLogManager * mgr = nil;
 @interface DWLogManager ()
 
@@ -44,26 +46,29 @@ static DWLogManager * mgr = nil;
 #endif
 }
 
-+(void)addLog:(NSString *)log filter:(DWLoggerFilter)filter {
++(void)addLog:(NSString *)log prefix:(NSString *)prefix filter:(DWLoggerFilter)filter {
     DWLogManager * logger = [DWLogManager shareLogManager];
-    if (logger.logFilter & filter && logger.logView) {
+    if (logger.logView) {
         DWLogModel * model = [DWLogModel new];
-        
-        NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:log];
-        NSRange r;
+        NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@",prefix,log]];
+        NSRange r = NSRangeNull;
         if (filter == DWLoggerInfo) {
-            r = [log rangeOfString:@"INFO"];
+            r = [prefix rangeOfString:@"INFO"];
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor greenColor] range:r];
         } else if (filter == DWLoggerWarning) {
-            r = [log rangeOfString:@"WARNING"];
+            r = [prefix rangeOfString:@"WARNING"];
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor yellowColor] range:r];
         } else if (filter == DWLoggerError) {
-            r = [log rangeOfString:@"ERROR"];
+            r = [prefix rangeOfString:@"ERROR"];
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
         }
+        model.absoluteLog = log;
         model.logString = aStr;
+        model.filter = filter;
         [[DWLogView loggerContainer] addObject:model];
-        [DWLogView updateLog];
+        if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
+            [DWLogView updateLog:model filter:filter];
+        }
     }
     if (logger.autoBackUp) {
         static dispatch_once_t onceToken;
