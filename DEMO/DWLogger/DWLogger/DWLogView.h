@@ -8,6 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "DWTableViewHelper.h"
+#import "DWLogManager.h"
+
+@interface DWLogModel : DWTableViewHelperModel
+
+@property (nonatomic ,copy) NSAttributedString * logString;
+
+@property (nonatomic ,assign) DWLoggerFilter filter;
+
+@end
 
 @interface DWLogView : UIWindow
 
@@ -37,18 +46,12 @@
 +(NSMutableArray *)loggerContainer;
 
 ///更新日志
-+(void)updateLog;
++(void)updateLog:(DWLogModel *)logModel filter:(DWLoggerFilter)filter;
 @end
 
 @interface DWFloatPot : UIWindow;
 
 ///单例方法
 +(instancetype)sharePot;
-
-@end
-
-@interface DWLogModel : DWTableViewHelperModel
-
-@property (nonatomic ,copy) NSAttributedString * logString;
 
 @end

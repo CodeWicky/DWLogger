@@ -46,9 +46,8 @@ static DWLogManager * mgr = nil;
 
 +(void)addLog:(NSString *)log filter:(DWLoggerFilter)filter {
     DWLogManager * logger = [DWLogManager shareLogManager];
-    if (logger.logFilter & filter && logger.logView) {
+    if (logger.logView) {
         DWLogModel * model = [DWLogModel new];
-        
         NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:log];
         NSRange r;
         if (filter == DWLoggerInfo) {
@@ -62,8 +61,11 @@ static DWLogManager * mgr = nil;
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
         }
         model.logString = aStr;
+        model.filter = filter;
         [[DWLogView loggerContainer] addObject:model];
-        [DWLogView updateLog];
+        if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
+            [DWLogView updateLog:model filter:filter];
+        }
     }
     if (logger.autoBackUp) {
         static dispatch_once_t onceToken;

@@ -25,6 +25,8 @@
 		9BFC3FAB1F7E413C00BF15B7 /* DWLoggerBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9BFC3F9E1F7E413C00BF15B7 /* DWLoggerBundle.bundle */; };
 		9BFC3FAC1F7E413C00BF15B7 /* DWLogManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3FA01F7E413C00BF15B7 /* DWLogManager.m */; };
 		9BFC3FAD1F7E413C00BF15B7 /* DWLogView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3FA21F7E413C00BF15B7 /* DWLogView.m */; };
+		9BFC40D11F81F7F700BF15B7 /* NSArray+DWArrayUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC40D01F81F0F400BF15B7 /* NSArray+DWArrayUtils.m */; };
+		9BFC40D51F81FF2300BF15B7 /* UIView+DWViewUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC40D41F81FF1E00BF15B7 /* UIView+DWViewUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +81,10 @@
 		9BFC3FA01F7E413C00BF15B7 /* DWLogManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWLogManager.m; sourceTree = "<group>"; };
 		9BFC3FA11F7E413C00BF15B7 /* DWLogView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWLogView.h; sourceTree = "<group>"; };
 		9BFC3FA21F7E413C00BF15B7 /* DWLogView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWLogView.m; sourceTree = "<group>"; };
+		9BFC40CF1F81F0F400BF15B7 /* NSArray+DWArrayUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+DWArrayUtils.h"; sourceTree = "<group>"; };
+		9BFC40D01F81F0F400BF15B7 /* NSArray+DWArrayUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+DWArrayUtils.m"; sourceTree = "<group>"; };
+		9BFC40D31F81FF1E00BF15B7 /* UIView+DWViewUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+DWViewUtils.h"; sourceTree = "<group>"; };
+		9BFC40D41F81FF1E00BF15B7 /* UIView+DWViewUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+DWViewUtils.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +184,8 @@
 		9BFC3F8C1F7E413C00BF15B7 /* Dependence */ = {
 			isa = PBXGroup;
 			children = (
+				9BFC40D21F81FF1E00BF15B7 /* DWViewUtils */,
+				9BFC40CE1F81F0F400BF15B7 /* DWArrayUtils */,
 				9BFC3F8D1F7E413C00BF15B7 /* DWCheckBox */,
 				9BFC3F911F7E413C00BF15B7 /* DWFileManager */,
 				9BFC3F951F7E413C00BF15B7 /* DWTableViewHelper */,
@@ -216,6 +224,24 @@
 				9BFC3F9C1F7E413C00BF15B7 /* DWTransaction.m */,
 			);
 			path = DWTableViewHelper;
+			sourceTree = "<group>";
+		};
+		9BFC40CE1F81F0F400BF15B7 /* DWArrayUtils */ = {
+			isa = PBXGroup;
+			children = (
+				9BFC40CF1F81F0F400BF15B7 /* NSArray+DWArrayUtils.h */,
+				9BFC40D01F81F0F400BF15B7 /* NSArray+DWArrayUtils.m */,
+			);
+			path = DWArrayUtils;
+			sourceTree = "<group>";
+		};
+		9BFC40D21F81FF1E00BF15B7 /* DWViewUtils */ = {
+			isa = PBXGroup;
+			children = (
+				9BFC40D31F81FF1E00BF15B7 /* UIView+DWViewUtils.h */,
+				9BFC40D41F81FF1E00BF15B7 /* UIView+DWViewUtils.m */,
+			);
+			path = DWViewUtils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -360,9 +386,11 @@
 				9BFC3FAA1F7E413C00BF15B7 /* DWTransaction.m in Sources */,
 				9B2FA0D21F7A276100AAC6CF /* ViewController.m in Sources */,
 				9BFC3FA31F7E413C00BF15B7 /* DWCheckBox.m in Sources */,
+				9BFC40D11F81F7F700BF15B7 /* NSArray+DWArrayUtils.m in Sources */,
 				9B2FA0DD1F7A276100AAC6CF /* main.m in Sources */,
 				9BFC3FAC1F7E413C00BF15B7 /* DWLogManager.m in Sources */,
 				9BFC3FAD1F7E413C00BF15B7 /* DWLogView.m in Sources */,
+				9BFC40D51F81FF2300BF15B7 /* UIView+DWViewUtils.m in Sources */,
 				9B2FA0CF1F7A276100AAC6CF /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

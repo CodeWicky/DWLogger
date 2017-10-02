@@ -11,6 +11,7 @@
 #import "DWLogView.h"
 #import "AppDelegate.h"
 #import "DWCheckBox.h"
+#import "UIView+DWViewUtils.h"
 @interface ViewController ()
 
 @end
@@ -44,14 +45,13 @@
 //    button.backgroundColor = [UIColor greenColor];
 //    [image addSubview:button];
 //    [button addTarget: self action:@selector(aBtnAction:) forControlEvents:(UIControlEventTouchUpInside)];
-    
+    DWLog(@"equal = %d",[self.view.viewController isEqual:self]);
     NSLog(@"asd %d",543);
     DWLog(@"asd");
     DWLogInfo(@"1.%@", @"asd");
     DWLogError(@"2.errer %d",2);
     DWLogWarning(@"3.%d - %d",1,2);
     DWLogInfo(@"%@",[UIApplication sharedApplication].windows);
-    [DWLogManager printCallStackSymbols];
 }
 
 -(void)aBtnAction:(UIButton *)sender
