@@ -52,7 +52,7 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
 +(instancetype)shareLogManager;
 
 ///添加日志
-+(void)addLog:(NSString *)log filter:(DWLoggerFilter)filter;
++(void)addLog:(NSString *)log prefix:(NSString *)prefix filter:(DWLoggerFilter)filter;
 
 ///设置日志视图
 +(void)setupLogView:(DWLogView *)logView;

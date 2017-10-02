@@ -50,6 +50,26 @@
 
 
 
+@interface DWLogViewController : UIViewController<UISearchResultsUpdating>
+
+@property (nonatomic ,strong) UITableView * mainTab;
+
+@property (nonatomic ,strong) DWTableViewHelper * helper;
+
+@property (nonatomic ,strong) NSMutableArray * dataArr;
+
+@property (nonatomic ,strong) NSMutableArray * filterLogArray;
+
+@property (nonatomic ,assign) BOOL filterLogArrayNeedChange;
+
+@property (nonatomic ,strong) UISearchController * searchController;
+
+@property (nonatomic ,strong) NSMutableArray * searchArray;
+
+@end
+
+
+
 static DWFloatPot * pot = nil;
 @implementation DWFloatPot
 
@@ -94,15 +114,20 @@ static DWFloatPot * pot = nil;
 #pragma mark --- overwrite ---
 -(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     UIView * view = [super hitTest:point withEvent:event];
-    if ([view isEqual:self.rootViewController.view]) {
+    if ([view isEqual:self.rootViewController.view]) {///当前响应者为FloatView的rootViewController的根视图
         DWFloatPotViewController * vc = (DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController;
-        if (vc.checkIsShowing) {
+        if (vc.checkIsShowing) {///如果有展示checkView的话收起checkView，此时应该是FloatView所属window响应
             [vc hideCheckView];
             return view;
         }
-        return nil;
+        DWLogViewController * logVC = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+        if (logVC.searchController.searchBar.isFirstResponder) {///如果处于搜索状态，应该释放搜索栏的第一响应者，此时应该是FloatView所属window响应
+            [logVC.searchController.searchBar resignFirstResponder];
+            return view;
+        }
+        return nil;///否则没有点击到FloatPot的按钮，应该LogView应该不做响应
     }
-    return view;
+    return view;///返回不为根视图，则有可能为nil或者FloatView的button。
 }
 @end
 
@@ -154,30 +179,44 @@ static DWFloatPot * pot = nil;
 
 
 
-@interface DWLogViewController : UIViewController
-
-@property (nonatomic ,strong) UITableView * mainTab;
-
-@property (nonatomic ,strong) DWTableViewHelper * helper;
-
-@property (nonatomic ,strong) NSMutableArray * dataArr;
-
-@property (nonatomic ,strong) NSMutableArray * filterLogArray;
-
-@property (nonatomic ,assign) BOOL filterLogArrayNeedChange;
-
-@end
-
 @implementation DWLogViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self.view addSubview:self.searchController.searchBar];
     [self.view addSubview:self.mainTab];
+    if ([UIScrollView instancesRespondToSelector:NSSelectorFromString(@"setContentInsetAdjustmentBehavior:")]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        [self.mainTab performSelector:NSSelectorFromString(@"setContentInsetAdjustmentBehavior:") withObject:@(2)];
+#pragma clang diagnostic pop
+    } else {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
 }
 
+#pragma mark --- UISearchResultsUpdating ---
+-(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    NSMutableArray * oriArr = self.filterLogArray ? : self.dataArr;
+    oriArr = [self filterSearchArray:oriArr];
+    self.helper.dataSource = oriArr;
+    [self.helper reloadDataWithCompletion:nil];
+}
+
+-(NSMutableArray *)filterSearchArray:(NSMutableArray *)array {
+    NSString * conditionString = self.searchController.searchBar.text;
+    if (!conditionString.length) {
+        return array;
+    }
+    return [[array dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
+        return [obj.absoluteLog containsString:conditionString];
+    }] mutableCopy];
+}
+
+#pragma mark --- setter/getter ---
 -(UITableView *)mainTab {
     if (!_mainTab) {
-        _mainTab = [[UITableView alloc] initWithFrame:self.view.bounds style:(UITableViewStylePlain)];
+        _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, self.searchController.searchBar.height, self.view.width, self.view.height - self.searchController.searchBar.height) style:(UITableViewStylePlain)];
         self.helper = [[DWTableViewHelper alloc] initWithTabV:_mainTab dataSource:self.dataArr];
         self.helper.useAutoRowHeight = YES;
         _mainTab.backgroundColor = [UIColor clearColor];
@@ -196,12 +235,24 @@ static DWFloatPot * pot = nil;
     return _dataArr;
 }
 
--(NSMutableArray *)filterLogArray
+-(NSMutableArray *)searchArray
 {
-    if (!_filterLogArray) {
-        _filterLogArray = [NSMutableArray array];
+    if (!_searchArray) {
+        _searchArray = [NSMutableArray array];
     }
-    return _filterLogArray;
+    return _searchArray;
+}
+
+-(UISearchController *)searchController {
+    if (!_searchController) {
+        _searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+        _searchController.searchResultsUpdater = self;
+        _searchController.hidesNavigationBarDuringPresentation = NO;
+        _searchController.dimsBackgroundDuringPresentation = NO;
+        _searchController.obscuresBackgroundDuringPresentation = NO;
+//        _searchController.active = YES;
+    }
+    return _searchController;
 }
 
 @end
@@ -273,37 +324,30 @@ static DWLogView * loggerView = nil;
 
 +(void)updateLog:(DWLogModel *)logModel filter:(DWLoggerFilter)filter {
     DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
-    if (vc.filterLogArrayNeedChange) {
+    if (vc.filterLogArrayNeedChange) {///保证filterLogArray完整，后再以搜索条件过滤搜索数组，再刷新
         if (filter == DWLoggerIgnore) {
-            vc.helper.dataSource = @[];
-            vc.filterLogArray = nil;
-            [vc.mainTab reloadData];
+            NSMutableArray * tempArr = [self filterAllArr:vc.dataArr];
+            vc.filterLogArray = tempArr;
+            tempArr = [vc filterSearchArray:tempArr];
+            vc.helper.dataSource = tempArr;
         } else if (filter == DWLoggerAll) {
-            vc.helper.dataSource = vc.dataArr;
+            vc.helper.dataSource = [vc filterSearchArray:vc.dataArr];
             vc.filterLogArray = nil;
-            UITableView * tab = vc.mainTab;
-            NSUInteger count = vc.dataArr.count;
-            [vc.helper reloadDataWithCompletion:^{
-                if (count == 0) {
-                    return;
-                }
-                NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
-                [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
-            }];
         } else {
             NSMutableArray * tempArr = [self filterDataArr:vc.dataArr filter:filter];
             vc.filterLogArray = tempArr;
+            tempArr = [vc filterSearchArray:tempArr];
             vc.helper.dataSource = tempArr;
-            UITableView * tab = vc.mainTab;
-            NSUInteger count = tempArr.count;
-            [vc.helper reloadDataWithCompletion:^{
-                if (count == 0) {
-                    return;
-                }
-                NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
-                [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
-            }];
         }
+        NSUInteger count = vc.helper.dataSource.count;
+        UITableView * tab = vc.mainTab;
+        [vc.helper reloadDataWithCompletion:^{
+            if (count == 0) {
+                return;
+            }
+            NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
+            [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
+        }];
         vc.filterLogArrayNeedChange = NO;
         return;
     }
@@ -336,6 +380,12 @@ static DWLogView * loggerView = nil;
 +(NSMutableArray *)filterDataArr:(NSArray <DWLogModel *>*)dataArr filter:(DWLoggerFilter)filter {
     return [[dataArr dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
         return obj.filter & filter;
+    }] mutableCopy];
+}
+
++(NSMutableArray *)filterAllArr:(NSArray <DWLogModel *>*)allArr {
+    return [[allArr dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
+        return obj.filter == DWLoggerAll;
     }] mutableCopy];
 }
 

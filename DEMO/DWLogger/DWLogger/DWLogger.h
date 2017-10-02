@@ -24,6 +24,13 @@
  添加NSLog替换为DWLog的日志替换宏
  DWLog中日志输出函数改为printf函数，防止NSLog宏的循环调用
  修复不选详细日志模式时模式前缀颜色失效问题
+ 
+ version 1.0.2
+ 过滤器逻辑修改
+ 添加日志搜索模式相关逻辑
+ 添加iOS11适配
+ 修复tableView的header、footer高度适配
+ 
  */
 
 #ifndef DWLogger_h
@@ -69,39 +76,38 @@ DWLogWithFilter(DWLoggerError,__VA_ARGS__);\
 #define DWLogWithFilter(f,...) \
 do {\
 DWLogManager * logger = [DWLogManager shareLogManager];\
-NSString * temp = [NSString stringWithFormat:__VA_ARGS__];\
-NSString * prefix = nil;\
+NSString * log = [NSString stringWithFormat:__VA_ARGS__];\
+NSString * filterStr = nil;\
 switch (f) {\
 case DWLoggerInfo:\
-prefix = @"INFO: ";\
+filterStr = @"INFO: ";\
 break;\
 case DWLoggerError:\
-prefix = @"ERROR: ";\
+filterStr = @"ERROR: ";\
 break;\
 case DWLoggerWarning:\
-prefix = @"WARNING: ";\
+filterStr = @"WARNING: ";\
 break;\
 default:\
-prefix = @"";\
+filterStr = @"";\
 break;\
 }\
-temp = [prefix stringByAppendingString:temp];\
-NSString * logStr = @"";\
+NSString * prefix = @"";\
 NSString * timeStr = [logger.timeFormatter stringFromDate:[NSDate date]];\
-logStr = [logStr stringByAppendingString:timeStr];\
-logStr = [logStr stringByAppendingString:[NSString stringWithFormat:@" %@",logger.projectName]];\
+prefix = [prefix stringByAppendingString:timeStr];\
+prefix = [prefix stringByAppendingString:[NSString stringWithFormat:@" %@",logger.projectName]];\
 NSString * file = [[NSString stringWithUTF8String:__FILE__] lastPathComponent];\
-logStr = [logStr stringByAppendingString:[NSString stringWithFormat:@"[%@",file]];\
-logStr = [logStr stringByAppendingString:[NSString stringWithFormat:@" line:%d method:%@] ",__LINE__,NSStringFromSelector(_cmd)]];\
+prefix = [prefix stringByAppendingString:[NSString stringWithFormat:@"[%@",file]];\
+prefix = [prefix stringByAppendingString:[NSString stringWithFormat:@" line:%d method:%@] ",__LINE__,NSStringFromSelector(_cmd)]];\
+prefix = [prefix stringByAppendingString:filterStr];\
 if (logger.logFilter & f) {\
-printf("%s%s\n",[logStr cStringUsingEncoding:NSUTF8StringEncoding],[temp cStringUsingEncoding:NSUTF8StringEncoding]);\
+printf("%s%s\n",[prefix cStringUsingEncoding:NSUTF8StringEncoding],[log cStringUsingEncoding:NSUTF8StringEncoding]);\
 }\
 if (!logger.disableLogger) {\
 if (!logger.particularLog) {\
-logStr = @"";\
+prefix = filterStr;\
 }\
-logStr = [logStr stringByAppendingString:temp];\
-[DWLogManager addLog:logStr filter:f];\
+[DWLogManager addLog:log prefix:prefix filter:f];\
 }\
 } while (0)
 

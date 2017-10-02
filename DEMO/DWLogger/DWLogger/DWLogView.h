@@ -12,16 +12,23 @@
 
 @interface DWLogModel : DWTableViewHelperModel
 
-@property (nonatomic ,copy) NSAttributedString * logString;
+///组装完成的全部Log字符串
+@property (nonatomic ,strong) NSAttributedString * logString;
 
+///纯输出的日志
+@property (nonatomic ,copy) NSString * absoluteLog;
+
+///当前日志对应类型
 @property (nonatomic ,assign) DWLoggerFilter filter;
 
 @end
 
 @interface DWLogView : UIWindow
 
+///LogView是否正在展示
 @property (nonatomic ,assign ,readonly) BOOL isShowing;
 
+///LogView是否允许交互
 @property (nonatomic ,assign ,readonly) BOOL interactionEnabled;
 
 ///单例方法

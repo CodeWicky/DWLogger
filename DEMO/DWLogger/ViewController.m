@@ -23,8 +23,6 @@
     
     self.view.backgroundColor = [UIColor redColor];
     
-    DWLog(@"%@",[DWLogManager shareLogManager].logFilePath);
-    
 //    [DWLogManager shareLogManager].particularLog = YES;
 ////    [DWLogManager shareLogManager].disableLogger = YES;
 //    [DWLogManager shareLogManager].autoBackUp = YES;
@@ -51,6 +49,7 @@
     DWLogInfo(@"1.%@", @"asd");
     DWLogError(@"2.errer %d",2);
     DWLogWarning(@"3.%d - %d",1,2);
+    DWLogWarning(@"8765432");
     DWLogInfo(@"%@",[UIApplication sharedApplication].windows);
 }
 
