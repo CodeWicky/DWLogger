@@ -64,8 +64,6 @@
 
 @property (nonatomic ,strong) UISearchController * searchController;
 
-@property (nonatomic ,strong) NSMutableArray * searchArray;
-
 @end
 
 
@@ -233,14 +231,6 @@ static DWFloatPot * pot = nil;
         _dataArr = [NSMutableArray array];
     }
     return _dataArr;
-}
-
--(NSMutableArray *)searchArray
-{
-    if (!_searchArray) {
-        _searchArray = [NSMutableArray array];
-    }
-    return _searchArray;
 }
 
 -(UISearchController *)searchController {
