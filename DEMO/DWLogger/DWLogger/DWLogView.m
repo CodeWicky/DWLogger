@@ -250,7 +250,6 @@ static DWFloatPot * pot = nil;
         _searchController.hidesNavigationBarDuringPresentation = NO;
         _searchController.dimsBackgroundDuringPresentation = NO;
         _searchController.obscuresBackgroundDuringPresentation = NO;
-//        _searchController.active = YES;
     }
     return _searchController;
 }
@@ -352,12 +351,14 @@ static DWLogView * loggerView = nil;
         return;
     }
     
-    NSUInteger count = vc.dataArr.count;
+    NSUInteger count = 0;
     UITableView * tab = vc.mainTab;
     if (vc.filterLogArray) {
         if (logModel && filter & [DWLogManager shareLogManager].logFilter) {
             [vc.filterLogArray addObject:logModel];
-            count = vc.filterLogArray.count;
+            NSMutableArray * temp = [vc filterSearchArray:vc.filterLogArray];
+            vc.helper.dataSource = temp;
+            count = temp.count;
             [vc.helper reloadDataWithCompletion:^{
                 if (count == 0) {
                     return;
@@ -368,6 +369,9 @@ static DWLogView * loggerView = nil;
         }
         return;
     }
+    NSMutableArray * temp = [vc filterSearchArray:vc.dataArr];
+    count = temp.count;
+    vc.helper.dataSource = temp;
     [vc.helper reloadDataWithCompletion:^{
         if (count == 0) {
             return;

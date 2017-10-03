@@ -51,6 +51,9 @@
     DWLogWarning(@"3.%d - %d",1,2);
     DWLogWarning(@"8765432");
     DWLogInfo(@"%@",[UIApplication sharedApplication].windows);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        DWLogWarning(@"- - -");
+    });
 }
 
 -(void)aBtnAction:(UIButton *)sender
