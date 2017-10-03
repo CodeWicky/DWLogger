@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B1592F41F83D3F3003ECA7E /* NSArray+DWArrayUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592DB1F83D3F2003ECA7E /* NSArray+DWArrayUtils.m */; };
+		9B1592F51F83D3F3003ECA7E /* DWCheckBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592DE1F83D3F3003ECA7E /* DWCheckBox.m */; };
+		9B1592F61F83D3F3003ECA7E /* DWCheckBoxBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B1592DF1F83D3F3003ECA7E /* DWCheckBoxBundle.bundle */; };
+		9B1592F71F83D3F3003ECA7E /* DWFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592E21F83D3F3003ECA7E /* DWFileManager.m */; };
+		9B1592F81F83D3F3003ECA7E /* DWOperationCancelFlag.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592E51F83D3F3003ECA7E /* DWOperationCancelFlag.m */; };
+		9B1592F91F83D3F3003ECA7E /* DWTableViewHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592E71F83D3F3003ECA7E /* DWTableViewHelper.m */; };
+		9B1592FA1F83D3F3003ECA7E /* DWTableViewHelperResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B1592E81F83D3F3003ECA7E /* DWTableViewHelperResource.bundle */; };
+		9B1592FB1F83D3F3003ECA7E /* DWTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592EA1F83D3F3003ECA7E /* DWTransaction.m */; };
+		9B1592FC1F83D3F3003ECA7E /* UIView+DWViewUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592ED1F83D3F3003ECA7E /* UIView+DWViewUtils.m */; };
+		9B1592FD1F83D3F3003ECA7E /* DWLoggerBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B1592EF1F83D3F3003ECA7E /* DWLoggerBundle.bundle */; };
+		9B1592FE1F83D3F3003ECA7E /* DWLogManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592F11F83D3F3003ECA7E /* DWLogManager.m */; };
+		9B1592FF1F83D3F3003ECA7E /* DWLogView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592F31F83D3F3003ECA7E /* DWLogView.m */; };
 		9B2FA0CF1F7A276100AAC6CF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0CE1F7A276100AAC6CF /* AppDelegate.m */; };
 		9B2FA0D21F7A276100AAC6CF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0D11F7A276100AAC6CF /* ViewController.m */; };
 		9B2FA0D51F7A276100AAC6CF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B2FA0D31F7A276100AAC6CF /* Main.storyboard */; };
@@ -15,18 +27,6 @@
 		9B2FA0DD1F7A276100AAC6CF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0DC1F7A276100AAC6CF /* main.m */; };
 		9B2FA0E71F7A276100AAC6CF /* DWLoggerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0E61F7A276100AAC6CF /* DWLoggerTests.m */; };
 		9B2FA0F21F7A276100AAC6CF /* DWLoggerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0F11F7A276100AAC6CF /* DWLoggerUITests.m */; };
-		9BFC3FA31F7E413C00BF15B7 /* DWCheckBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3F8F1F7E413C00BF15B7 /* DWCheckBox.m */; };
-		9BFC3FA41F7E413C00BF15B7 /* DWCheckBoxBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9BFC3F901F7E413C00BF15B7 /* DWCheckBoxBundle.bundle */; };
-		9BFC3FA51F7E413C00BF15B7 /* DWFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3F931F7E413C00BF15B7 /* DWFileManager.m */; };
-		9BFC3FA71F7E413C00BF15B7 /* DWOperationCancelFlag.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3F971F7E413C00BF15B7 /* DWOperationCancelFlag.m */; };
-		9BFC3FA81F7E413C00BF15B7 /* DWTableViewHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3F991F7E413C00BF15B7 /* DWTableViewHelper.m */; };
-		9BFC3FA91F7E413C00BF15B7 /* DWTableViewHelperResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9BFC3F9A1F7E413C00BF15B7 /* DWTableViewHelperResource.bundle */; };
-		9BFC3FAA1F7E413C00BF15B7 /* DWTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3F9C1F7E413C00BF15B7 /* DWTransaction.m */; };
-		9BFC3FAB1F7E413C00BF15B7 /* DWLoggerBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9BFC3F9E1F7E413C00BF15B7 /* DWLoggerBundle.bundle */; };
-		9BFC3FAC1F7E413C00BF15B7 /* DWLogManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3FA01F7E413C00BF15B7 /* DWLogManager.m */; };
-		9BFC3FAD1F7E413C00BF15B7 /* DWLogView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC3FA21F7E413C00BF15B7 /* DWLogView.m */; };
-		9BFC40D11F81F7F700BF15B7 /* NSArray+DWArrayUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC40D01F81F0F400BF15B7 /* NSArray+DWArrayUtils.m */; };
-		9BFC40D51F81FF2300BF15B7 /* UIView+DWViewUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC40D41F81FF1E00BF15B7 /* UIView+DWViewUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +47,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9B1592DA1F83D3F2003ECA7E /* NSArray+DWArrayUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+DWArrayUtils.h"; sourceTree = "<group>"; };
+		9B1592DB1F83D3F2003ECA7E /* NSArray+DWArrayUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+DWArrayUtils.m"; sourceTree = "<group>"; };
+		9B1592DD1F83D3F3003ECA7E /* DWCheckBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWCheckBox.h; sourceTree = "<group>"; };
+		9B1592DE1F83D3F3003ECA7E /* DWCheckBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWCheckBox.m; sourceTree = "<group>"; };
+		9B1592DF1F83D3F3003ECA7E /* DWCheckBoxBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DWCheckBoxBundle.bundle; sourceTree = "<group>"; };
+		9B1592E11F83D3F3003ECA7E /* DWFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWFileManager.h; sourceTree = "<group>"; };
+		9B1592E21F83D3F3003ECA7E /* DWFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWFileManager.m; sourceTree = "<group>"; };
+		9B1592E41F83D3F3003ECA7E /* DWOperationCancelFlag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWOperationCancelFlag.h; sourceTree = "<group>"; };
+		9B1592E51F83D3F3003ECA7E /* DWOperationCancelFlag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWOperationCancelFlag.m; sourceTree = "<group>"; };
+		9B1592E61F83D3F3003ECA7E /* DWTableViewHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWTableViewHelper.h; sourceTree = "<group>"; };
+		9B1592E71F83D3F3003ECA7E /* DWTableViewHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWTableViewHelper.m; sourceTree = "<group>"; };
+		9B1592E81F83D3F3003ECA7E /* DWTableViewHelperResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DWTableViewHelperResource.bundle; sourceTree = "<group>"; };
+		9B1592E91F83D3F3003ECA7E /* DWTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWTransaction.h; sourceTree = "<group>"; };
+		9B1592EA1F83D3F3003ECA7E /* DWTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWTransaction.m; sourceTree = "<group>"; };
+		9B1592EC1F83D3F3003ECA7E /* UIView+DWViewUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+DWViewUtils.h"; sourceTree = "<group>"; };
+		9B1592ED1F83D3F3003ECA7E /* UIView+DWViewUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+DWViewUtils.m"; sourceTree = "<group>"; };
+		9B1592EE1F83D3F3003ECA7E /* DWLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWLogger.h; sourceTree = "<group>"; };
+		9B1592EF1F83D3F3003ECA7E /* DWLoggerBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DWLoggerBundle.bundle; sourceTree = "<group>"; };
+		9B1592F01F83D3F3003ECA7E /* DWLogManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWLogManager.h; sourceTree = "<group>"; };
+		9B1592F11F83D3F3003ECA7E /* DWLogManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWLogManager.m; sourceTree = "<group>"; };
+		9B1592F21F83D3F3003ECA7E /* DWLogView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWLogView.h; sourceTree = "<group>"; };
+		9B1592F31F83D3F3003ECA7E /* DWLogView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWLogView.m; sourceTree = "<group>"; };
 		9B2FA0CA1F7A276100AAC6CF /* DWLogger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DWLogger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B2FA0CD1F7A276100AAC6CF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9B2FA0CE1F7A276100AAC6CF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -63,28 +85,6 @@
 		9B2FA0ED1F7A276100AAC6CF /* DWLoggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DWLoggerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B2FA0F11F7A276100AAC6CF /* DWLoggerUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWLoggerUITests.m; sourceTree = "<group>"; };
 		9B2FA0F31F7A276100AAC6CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9BFC3F8E1F7E413C00BF15B7 /* DWCheckBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWCheckBox.h; sourceTree = "<group>"; };
-		9BFC3F8F1F7E413C00BF15B7 /* DWCheckBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWCheckBox.m; sourceTree = "<group>"; };
-		9BFC3F901F7E413C00BF15B7 /* DWCheckBoxBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DWCheckBoxBundle.bundle; sourceTree = "<group>"; };
-		9BFC3F921F7E413C00BF15B7 /* DWFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWFileManager.h; sourceTree = "<group>"; };
-		9BFC3F931F7E413C00BF15B7 /* DWFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWFileManager.m; sourceTree = "<group>"; };
-		9BFC3F961F7E413C00BF15B7 /* DWOperationCancelFlag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWOperationCancelFlag.h; sourceTree = "<group>"; };
-		9BFC3F971F7E413C00BF15B7 /* DWOperationCancelFlag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWOperationCancelFlag.m; sourceTree = "<group>"; };
-		9BFC3F981F7E413C00BF15B7 /* DWTableViewHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWTableViewHelper.h; sourceTree = "<group>"; };
-		9BFC3F991F7E413C00BF15B7 /* DWTableViewHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWTableViewHelper.m; sourceTree = "<group>"; };
-		9BFC3F9A1F7E413C00BF15B7 /* DWTableViewHelperResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DWTableViewHelperResource.bundle; sourceTree = "<group>"; };
-		9BFC3F9B1F7E413C00BF15B7 /* DWTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWTransaction.h; sourceTree = "<group>"; };
-		9BFC3F9C1F7E413C00BF15B7 /* DWTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWTransaction.m; sourceTree = "<group>"; };
-		9BFC3F9D1F7E413C00BF15B7 /* DWLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWLogger.h; sourceTree = "<group>"; };
-		9BFC3F9E1F7E413C00BF15B7 /* DWLoggerBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DWLoggerBundle.bundle; sourceTree = "<group>"; };
-		9BFC3F9F1F7E413C00BF15B7 /* DWLogManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWLogManager.h; sourceTree = "<group>"; };
-		9BFC3FA01F7E413C00BF15B7 /* DWLogManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWLogManager.m; sourceTree = "<group>"; };
-		9BFC3FA11F7E413C00BF15B7 /* DWLogView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWLogView.h; sourceTree = "<group>"; };
-		9BFC3FA21F7E413C00BF15B7 /* DWLogView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWLogView.m; sourceTree = "<group>"; };
-		9BFC40CF1F81F0F400BF15B7 /* NSArray+DWArrayUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+DWArrayUtils.h"; sourceTree = "<group>"; };
-		9BFC40D01F81F0F400BF15B7 /* NSArray+DWArrayUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+DWArrayUtils.m"; sourceTree = "<group>"; };
-		9BFC40D31F81FF1E00BF15B7 /* UIView+DWViewUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+DWViewUtils.h"; sourceTree = "<group>"; };
-		9BFC40D41F81FF1E00BF15B7 /* UIView+DWViewUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+DWViewUtils.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +112,84 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9B1592D71F83D3F2003ECA7E /* DWLogger */ = {
+			isa = PBXGroup;
+			children = (
+				9B1592D81F83D3F2003ECA7E /* Dependence */,
+				9B1592EE1F83D3F3003ECA7E /* DWLogger.h */,
+				9B1592EF1F83D3F3003ECA7E /* DWLoggerBundle.bundle */,
+				9B1592F01F83D3F3003ECA7E /* DWLogManager.h */,
+				9B1592F11F83D3F3003ECA7E /* DWLogManager.m */,
+				9B1592F21F83D3F3003ECA7E /* DWLogView.h */,
+				9B1592F31F83D3F3003ECA7E /* DWLogView.m */,
+			);
+			name = DWLogger;
+			path = ../../DWLogger;
+			sourceTree = "<group>";
+		};
+		9B1592D81F83D3F2003ECA7E /* Dependence */ = {
+			isa = PBXGroup;
+			children = (
+				9B1592D91F83D3F2003ECA7E /* DWArrayUtils */,
+				9B1592DC1F83D3F2003ECA7E /* DWCheckBox */,
+				9B1592E01F83D3F3003ECA7E /* DWFileManager */,
+				9B1592E31F83D3F3003ECA7E /* DWTableViewHelper */,
+				9B1592EB1F83D3F3003ECA7E /* DWViewUtils */,
+			);
+			path = Dependence;
+			sourceTree = "<group>";
+		};
+		9B1592D91F83D3F2003ECA7E /* DWArrayUtils */ = {
+			isa = PBXGroup;
+			children = (
+				9B1592DA1F83D3F2003ECA7E /* NSArray+DWArrayUtils.h */,
+				9B1592DB1F83D3F2003ECA7E /* NSArray+DWArrayUtils.m */,
+			);
+			path = DWArrayUtils;
+			sourceTree = "<group>";
+		};
+		9B1592DC1F83D3F2003ECA7E /* DWCheckBox */ = {
+			isa = PBXGroup;
+			children = (
+				9B1592DD1F83D3F3003ECA7E /* DWCheckBox.h */,
+				9B1592DE1F83D3F3003ECA7E /* DWCheckBox.m */,
+				9B1592DF1F83D3F3003ECA7E /* DWCheckBoxBundle.bundle */,
+			);
+			path = DWCheckBox;
+			sourceTree = "<group>";
+		};
+		9B1592E01F83D3F3003ECA7E /* DWFileManager */ = {
+			isa = PBXGroup;
+			children = (
+				9B1592E11F83D3F3003ECA7E /* DWFileManager.h */,
+				9B1592E21F83D3F3003ECA7E /* DWFileManager.m */,
+			);
+			path = DWFileManager;
+			sourceTree = "<group>";
+		};
+		9B1592E31F83D3F3003ECA7E /* DWTableViewHelper */ = {
+			isa = PBXGroup;
+			children = (
+				9B1592E41F83D3F3003ECA7E /* DWOperationCancelFlag.h */,
+				9B1592E51F83D3F3003ECA7E /* DWOperationCancelFlag.m */,
+				9B1592E61F83D3F3003ECA7E /* DWTableViewHelper.h */,
+				9B1592E71F83D3F3003ECA7E /* DWTableViewHelper.m */,
+				9B1592E81F83D3F3003ECA7E /* DWTableViewHelperResource.bundle */,
+				9B1592E91F83D3F3003ECA7E /* DWTransaction.h */,
+				9B1592EA1F83D3F3003ECA7E /* DWTransaction.m */,
+			);
+			path = DWTableViewHelper;
+			sourceTree = "<group>";
+		};
+		9B1592EB1F83D3F3003ECA7E /* DWViewUtils */ = {
+			isa = PBXGroup;
+			children = (
+				9B1592EC1F83D3F3003ECA7E /* UIView+DWViewUtils.h */,
+				9B1592ED1F83D3F3003ECA7E /* UIView+DWViewUtils.m */,
+			);
+			path = DWViewUtils;
+			sourceTree = "<group>";
+		};
 		9B2FA0C11F7A276100AAC6CF = {
 			isa = PBXGroup;
 			children = (
@@ -135,11 +213,11 @@
 		9B2FA0CC1F7A276100AAC6CF /* DWLogger */ = {
 			isa = PBXGroup;
 			children = (
+				9B1592D71F83D3F2003ECA7E /* DWLogger */,
 				9B2FA0CD1F7A276100AAC6CF /* AppDelegate.h */,
 				9B2FA0CE1F7A276100AAC6CF /* AppDelegate.m */,
 				9B2FA0D01F7A276100AAC6CF /* ViewController.h */,
 				9B2FA0D11F7A276100AAC6CF /* ViewController.m */,
-				9BFC3F8B1F7E413C00BF15B7 /* DWLogger */,
 				9B2FA0D31F7A276100AAC6CF /* Main.storyboard */,
 				9B2FA0D61F7A276100AAC6CF /* Assets.xcassets */,
 				9B2FA0D81F7A276100AAC6CF /* LaunchScreen.storyboard */,
@@ -165,83 +243,6 @@
 				9B2FA0F31F7A276100AAC6CF /* Info.plist */,
 			);
 			path = DWLoggerUITests;
-			sourceTree = "<group>";
-		};
-		9BFC3F8B1F7E413C00BF15B7 /* DWLogger */ = {
-			isa = PBXGroup;
-			children = (
-				9BFC3F8C1F7E413C00BF15B7 /* Dependence */,
-				9BFC3F9D1F7E413C00BF15B7 /* DWLogger.h */,
-				9BFC3F9E1F7E413C00BF15B7 /* DWLoggerBundle.bundle */,
-				9BFC3F9F1F7E413C00BF15B7 /* DWLogManager.h */,
-				9BFC3FA01F7E413C00BF15B7 /* DWLogManager.m */,
-				9BFC3FA11F7E413C00BF15B7 /* DWLogView.h */,
-				9BFC3FA21F7E413C00BF15B7 /* DWLogView.m */,
-			);
-			path = DWLogger;
-			sourceTree = "<group>";
-		};
-		9BFC3F8C1F7E413C00BF15B7 /* Dependence */ = {
-			isa = PBXGroup;
-			children = (
-				9BFC40D21F81FF1E00BF15B7 /* DWViewUtils */,
-				9BFC40CE1F81F0F400BF15B7 /* DWArrayUtils */,
-				9BFC3F8D1F7E413C00BF15B7 /* DWCheckBox */,
-				9BFC3F911F7E413C00BF15B7 /* DWFileManager */,
-				9BFC3F951F7E413C00BF15B7 /* DWTableViewHelper */,
-			);
-			path = Dependence;
-			sourceTree = "<group>";
-		};
-		9BFC3F8D1F7E413C00BF15B7 /* DWCheckBox */ = {
-			isa = PBXGroup;
-			children = (
-				9BFC3F8E1F7E413C00BF15B7 /* DWCheckBox.h */,
-				9BFC3F8F1F7E413C00BF15B7 /* DWCheckBox.m */,
-				9BFC3F901F7E413C00BF15B7 /* DWCheckBoxBundle.bundle */,
-			);
-			path = DWCheckBox;
-			sourceTree = "<group>";
-		};
-		9BFC3F911F7E413C00BF15B7 /* DWFileManager */ = {
-			isa = PBXGroup;
-			children = (
-				9BFC3F921F7E413C00BF15B7 /* DWFileManager.h */,
-				9BFC3F931F7E413C00BF15B7 /* DWFileManager.m */,
-			);
-			path = DWFileManager;
-			sourceTree = "<group>";
-		};
-		9BFC3F951F7E413C00BF15B7 /* DWTableViewHelper */ = {
-			isa = PBXGroup;
-			children = (
-				9BFC3F961F7E413C00BF15B7 /* DWOperationCancelFlag.h */,
-				9BFC3F971F7E413C00BF15B7 /* DWOperationCancelFlag.m */,
-				9BFC3F981F7E413C00BF15B7 /* DWTableViewHelper.h */,
-				9BFC3F991F7E413C00BF15B7 /* DWTableViewHelper.m */,
-				9BFC3F9A1F7E413C00BF15B7 /* DWTableViewHelperResource.bundle */,
-				9BFC3F9B1F7E413C00BF15B7 /* DWTransaction.h */,
-				9BFC3F9C1F7E413C00BF15B7 /* DWTransaction.m */,
-			);
-			path = DWTableViewHelper;
-			sourceTree = "<group>";
-		};
-		9BFC40CE1F81F0F400BF15B7 /* DWArrayUtils */ = {
-			isa = PBXGroup;
-			children = (
-				9BFC40CF1F81F0F400BF15B7 /* NSArray+DWArrayUtils.h */,
-				9BFC40D01F81F0F400BF15B7 /* NSArray+DWArrayUtils.m */,
-			);
-			path = DWArrayUtils;
-			sourceTree = "<group>";
-		};
-		9BFC40D21F81FF1E00BF15B7 /* DWViewUtils */ = {
-			isa = PBXGroup;
-			children = (
-				9BFC40D31F81FF1E00BF15B7 /* UIView+DWViewUtils.h */,
-				9BFC40D41F81FF1E00BF15B7 /* UIView+DWViewUtils.m */,
-			);
-			path = DWViewUtils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -350,12 +351,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B1592FA1F83D3F3003ECA7E /* DWTableViewHelperResource.bundle in Resources */,
 				9B2FA0DA1F7A276100AAC6CF /* LaunchScreen.storyboard in Resources */,
-				9BFC3FAB1F7E413C00BF15B7 /* DWLoggerBundle.bundle in Resources */,
 				9B2FA0D71F7A276100AAC6CF /* Assets.xcassets in Resources */,
 				9B2FA0D51F7A276100AAC6CF /* Main.storyboard in Resources */,
-				9BFC3FA91F7E413C00BF15B7 /* DWTableViewHelperResource.bundle in Resources */,
-				9BFC3FA41F7E413C00BF15B7 /* DWCheckBoxBundle.bundle in Resources */,
+				9B1592FD1F83D3F3003ECA7E /* DWLoggerBundle.bundle in Resources */,
+				9B1592F61F83D3F3003ECA7E /* DWCheckBoxBundle.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,18 +381,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9BFC3FA71F7E413C00BF15B7 /* DWOperationCancelFlag.m in Sources */,
-				9BFC3FA51F7E413C00BF15B7 /* DWFileManager.m in Sources */,
-				9BFC3FA81F7E413C00BF15B7 /* DWTableViewHelper.m in Sources */,
-				9BFC3FAA1F7E413C00BF15B7 /* DWTransaction.m in Sources */,
 				9B2FA0D21F7A276100AAC6CF /* ViewController.m in Sources */,
-				9BFC3FA31F7E413C00BF15B7 /* DWCheckBox.m in Sources */,
-				9BFC40D11F81F7F700BF15B7 /* NSArray+DWArrayUtils.m in Sources */,
+				9B1592F81F83D3F3003ECA7E /* DWOperationCancelFlag.m in Sources */,
+				9B1592FB1F83D3F3003ECA7E /* DWTransaction.m in Sources */,
 				9B2FA0DD1F7A276100AAC6CF /* main.m in Sources */,
-				9BFC3FAC1F7E413C00BF15B7 /* DWLogManager.m in Sources */,
-				9BFC3FAD1F7E413C00BF15B7 /* DWLogView.m in Sources */,
-				9BFC40D51F81FF2300BF15B7 /* UIView+DWViewUtils.m in Sources */,
+				9B1592FC1F83D3F3003ECA7E /* UIView+DWViewUtils.m in Sources */,
 				9B2FA0CF1F7A276100AAC6CF /* AppDelegate.m in Sources */,
+				9B1592F91F83D3F3003ECA7E /* DWTableViewHelper.m in Sources */,
+				9B1592F41F83D3F3003ECA7E /* NSArray+DWArrayUtils.m in Sources */,
+				9B1592FE1F83D3F3003ECA7E /* DWLogManager.m in Sources */,
+				9B1592F71F83D3F3003ECA7E /* DWFileManager.m in Sources */,
+				9B1592FF1F83D3F3003ECA7E /* DWLogView.m in Sources */,
+				9B1592F51F83D3F3003ECA7E /* DWCheckBox.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
