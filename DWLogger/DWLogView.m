@@ -120,6 +120,9 @@ static DWFloatPot * pot = nil;
         }
         DWLogViewController * logVC = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
         if (logVC.searchController.searchBar.isFirstResponder) {///如果处于搜索状态，应该释放搜索栏的第一响应者，此时应该是FloatView所属window响应
+            if (!logVC.searchController.searchBar.text.length) {
+                logVC.searchController.active = NO;
+            }
             [logVC.searchController.searchBar resignFirstResponder];
             return view;
         }
