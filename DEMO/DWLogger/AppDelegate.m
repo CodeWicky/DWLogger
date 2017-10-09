@@ -22,6 +22,7 @@
     [DWLogManager configDefaultLogger];
     [DWLogManager shareLogManager].autoBackUp = NO;
     [DWLogManager configToCollectCrash];
+
     
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.rootViewController = [ViewController new];

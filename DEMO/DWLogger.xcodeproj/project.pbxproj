@@ -27,6 +27,7 @@
 		9B2FA0DD1F7A276100AAC6CF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0DC1F7A276100AAC6CF /* main.m */; };
 		9B2FA0E71F7A276100AAC6CF /* DWLoggerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0E61F7A276100AAC6CF /* DWLoggerTests.m */; };
 		9B2FA0F21F7A276100AAC6CF /* DWLoggerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0F11F7A276100AAC6CF /* DWLoggerUITests.m */; };
+		9BBD55741F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BBD55731F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,8 @@
 		9B2FA0ED1F7A276100AAC6CF /* DWLoggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DWLoggerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B2FA0F11F7A276100AAC6CF /* DWLoggerUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWLoggerUITests.m; sourceTree = "<group>"; };
 		9B2FA0F31F7A276100AAC6CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9BBD55721F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+DWDeviceUtils.h"; sourceTree = "<group>"; };
+		9BBD55731F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+DWDeviceUtils.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +133,7 @@
 		9B1592D81F83D3F2003ECA7E /* Dependence */ = {
 			isa = PBXGroup;
 			children = (
+				9BBD55711F8B8A0A0014D8EA /* DWDeviceUtils */,
 				9B1592D91F83D3F2003ECA7E /* DWArrayUtils */,
 				9B1592DC1F83D3F2003ECA7E /* DWCheckBox */,
 				9B1592E01F83D3F3003ECA7E /* DWFileManager */,
@@ -243,6 +247,15 @@
 				9B2FA0F31F7A276100AAC6CF /* Info.plist */,
 			);
 			path = DWLoggerUITests;
+			sourceTree = "<group>";
+		};
+		9BBD55711F8B8A0A0014D8EA /* DWDeviceUtils */ = {
+			isa = PBXGroup;
+			children = (
+				9BBD55721F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.h */,
+				9BBD55731F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.m */,
+			);
+			path = DWDeviceUtils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -388,6 +401,7 @@
 				9B1592FC1F83D3F3003ECA7E /* UIView+DWViewUtils.m in Sources */,
 				9B2FA0CF1F7A276100AAC6CF /* AppDelegate.m in Sources */,
 				9B1592F91F83D3F3003ECA7E /* DWTableViewHelper.m in Sources */,
+				9BBD55741F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.m in Sources */,
 				9B1592F41F83D3F3003ECA7E /* NSArray+DWArrayUtils.m in Sources */,
 				9B1592FE1F83D3F3003ECA7E /* DWLogManager.m in Sources */,
 				9B1592F71F83D3F3003ECA7E /* DWFileManager.m in Sources */,

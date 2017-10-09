@@ -114,7 +114,7 @@ prefix = filterStr;\
 
 #else
 
-#define DWLogWithFilter(f,FORMAT, ...)
+#define DWLogWithFilter(f,...)
 
 #endif
 

@@ -9,6 +9,7 @@
 #import "DWLogManager.h"
 #import "DWLogger.h"
 #import "DWFileManager.h"
+#import "UIDevice+DWDeviceUtils.h"
 
 #define FilePath [NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
 
@@ -29,6 +30,7 @@ static DWLogManager * mgr = nil;
 
 @implementation DWLogManager
 @synthesize logFilePath = _logFilePath;
+@synthesize projectName = _projectName;
 #pragma mark --- interface method ---
 +(instancetype)shareLogManager {
 #ifndef DevEvn
@@ -222,9 +224,7 @@ static inline void writeDataString2File(NSString * data,NSString * path,dispatch
 
 -(NSString *)projectName {
     if (!_projectName) {
-        NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-        NSString *executableFile = [infoDictionary objectForKey:(NSString *)kCFBundleExecutableKey];
-        _projectName = executableFile;
+        _projectName = [UIDevice dw_ProjectDisplayName];
     }
     return _projectName;
 }

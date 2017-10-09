@@ -37,7 +37,7 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
 @property (nonatomic ,assign) DWLoggerFilter logFilter;
 
 ///当前项目名称
-@property (nonatomic ,copy) NSString * projectName;
+@property (nonatomic ,copy ,readonly) NSString * projectName;
 
 ///自动备份日志沙盒地址
 @property (nonatomic ,copy ,readonly) NSString * logFilePath;
