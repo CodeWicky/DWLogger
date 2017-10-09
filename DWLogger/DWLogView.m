@@ -242,7 +242,9 @@ static DWFloatPot * pot = nil;
         _searchController.searchResultsUpdater = self;
         _searchController.hidesNavigationBarDuringPresentation = NO;
         _searchController.dimsBackgroundDuringPresentation = NO;
-        _searchController.obscuresBackgroundDuringPresentation = NO;
+        if (@available(iOS 9.1,*)) {
+            _searchController.obscuresBackgroundDuringPresentation = NO;
+        }
     }
     return _searchController;
 }

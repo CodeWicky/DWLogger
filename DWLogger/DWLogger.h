@@ -30,6 +30,7 @@
  添加日志搜索模式相关逻辑
  添加iOS11适配
  修复tableView的header、footer高度适配
+ 适配iOS8
  
  */
 
