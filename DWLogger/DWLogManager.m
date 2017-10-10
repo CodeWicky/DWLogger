@@ -54,7 +54,10 @@ static DWLogManager * mgr = nil;
         DWLogModel * model = [DWLogModel new];
         NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@",prefix,log]];
         NSRange r = NSRangeNull;
-        if (filter == DWLoggerInfo) {
+        if (filter == DWLoggerNormal) {
+            r = [prefix rangeOfString:@"NORMAL"];
+            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor cyanColor] range:r];
+        } else if (filter == DWLoggerInfo) {
             r = [prefix rangeOfString:@"INFO"];
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor greenColor] range:r];
         } else if (filter == DWLoggerWarning) {
@@ -63,6 +66,8 @@ static DWLogManager * mgr = nil;
         } else if (filter == DWLoggerError) {
             r = [prefix rangeOfString:@"ERROR"];
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
+        } else if (filter == DWLoggerAll) {
+            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, aStr.length)];
         }
         model.absoluteLog = log;
         model.logString = aStr;
@@ -84,7 +89,7 @@ static DWLogManager * mgr = nil;
                 });
             }
         });
-        [logger writeLog2File:log];
+        [logger writeLog2File:[NSString stringWithFormat:@"%@%@",prefix,log]];
     }
 }
 
@@ -140,12 +145,26 @@ static void exceptionHandler(NSException *exception)
 {
     NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyyMMdd-HHmmss"];
-    NSString * crashFileName = [formatter stringFromDate:[NSDate date]];
+    NSDate * date = [NSDate date];
+    NSString * crashFileName = [formatter stringFromDate:date];
     crashFileName = [crashFileName stringByAppendingString:@".crash"];
     NSString * path = [FilePath stringByAppendingPathComponent:@"Crash"];
     NSString * crashFilePath = [path stringByAppendingPathComponent:crashFileName];
     [DWFileManager dw_CreateFileAtPath:crashFilePath];
-    writeDataString2File(exception.debugDescription, crashFilePath, dispatch_queue_create("com.crashQueue.DWLogManager", DISPATCH_QUEUE_SERIAL));
+    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSString * timeStr = [formatter stringFromDate:date];
+    NSString * crashStr = @"";
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Name: %@\n",[UIDevice dw_ProjectDisplayName]]];
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Bundle ID: %@\n",[UIDevice dw_ProjectBundleId]]];
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Version: %@\n",[UIDevice dw_ProjectVersion]]];
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Build: %@\n",[UIDevice dw_ProjectBuildNo]]];
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Time: %@\n",timeStr]];
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device Model: %@\n",[UIDevice dw_DeviceDetailModel]]];
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device System: %@\n",[UIDevice dw_DeviceSystemVersion]]];
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device CPU Arch: %@\n",[UIDevice dw_DeviceCPUType]]];
+    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Detail:\n%@",exception.debugDescription]];
+    writeDataString2File(crashStr, crashFilePath, dispatch_queue_create("com.crashQueue.DWLogManager", DISPATCH_QUEUE_SERIAL));
+    printf("\nCrash Log Path Is %s\n\n",[crashFilePath cStringUsingEncoding:NSUTF8StringEncoding]);
 }
 
 #pragma mark --- tool method ---

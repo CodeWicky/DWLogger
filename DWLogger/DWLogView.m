@@ -15,6 +15,7 @@
 #define BtnLength 44
 #define BtnSpacing 20
 #define SpeedScale 400
+#define CheckViewHeight 102
 
 @interface DWFloatPotViewController : UIViewController
 
@@ -210,7 +211,7 @@ static DWFloatPot * pot = nil;
         return array;
     }
     return [[array dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
-        return [obj.absoluteLog containsString:conditionString];
+        return [obj.absoluteLog.uppercaseString containsString:conditionString.uppercaseString];
     }] mutableCopy];
 }
 
@@ -635,7 +636,7 @@ static DWLogView * loggerView = nil;
     self.modeBtn.selected = YES;
     self.checkIsShowing = YES;
     BOOL upwards = YES;
-    CGFloat y = self.modeBtn.frame.origin.y - 10 - 80;
+    CGFloat y = self.modeBtn.frame.origin.y - 10 - CheckViewHeight;
     if (self.modeBtn.center.y < self.view.center.y) {
         upwards = NO;
         y = self.modeBtn.bottom + 10;
@@ -647,7 +648,7 @@ static DWLogView * loggerView = nil;
     }
     self.checkView.frame = CGRectMake(x, tempY, 100, 0);
     [UIView animateWithDuration:0.4 animations:^{
-        self.checkView.frame = CGRectMake(x, y, 100, 80);
+        self.checkView.frame = CGRectMake(x, y, 100, CheckViewHeight);
     }];
 }
 
@@ -670,12 +671,15 @@ static DWLogView * loggerView = nil;
     NSArray * select = self.checkView.currentSelected;
     DWLoggerFilter filter = DWLoggerIgnore;
     if ([select containsObject:@0]) {
-        filter |= DWLoggerInfo;
+        filter |= DWLoggerNormal;
     }
     if ([select containsObject:@1]) {
-        filter |= DWLoggerWarning;
+        filter |= DWLoggerInfo;
     }
     if ([select containsObject:@2]) {
+        filter |= DWLoggerWarning;
+    }
+    if ([select containsObject:@3]) {
         filter |= DWLoggerError;
     }
     DWLogManager * logger = [DWLogManager shareLogManager];
@@ -698,16 +702,19 @@ static DWLogView * loggerView = nil;
     if (!_checkView) {
         NSMutableArray * defaultSelect = @[].mutableCopy;
         DWLogManager * logger = [DWLogManager shareLogManager];
-        if (logger.logFilter & DWLoggerInfo) {
+        if (logger.logFilter & DWLoggerNormal) {
             [defaultSelect addObject:@0];
         }
-        if (logger.logFilter & DWLoggerWarning) {
+        if (logger.logFilter & DWLoggerInfo) {
             [defaultSelect addObject:@1];
         }
-        if (logger.logFilter & DWLoggerError) {
+        if (logger.logFilter & DWLoggerWarning) {
             [defaultSelect addObject:@2];
         }
-        _checkView = [[DWCheckBoxView alloc] initWithFrame:CGRectMake(0, 0, 100, 80) multiSelect:YES titles:@[@"Info",@"Warning",@"Error"] defaultSelect:defaultSelect];
+        if (logger.logFilter & DWLoggerError) {
+            [defaultSelect addObject:@3];
+        }
+        _checkView = [[DWCheckBoxView alloc] initWithFrame:CGRectMake(0, 0, 100, CheckViewHeight) multiSelect:YES titles:@[@"Normal",@"Info",@"Warning",@"Error"] defaultSelect:defaultSelect];
         _checkView.backgroundColor = [UIColor colorWithWhite:1 alpha:1];
         _checkView.layer.cornerRadius = 10;
         _checkView.clipsToBounds = YES;

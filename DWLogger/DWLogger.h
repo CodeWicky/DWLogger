@@ -14,6 +14,16 @@
  提供不同日志输出等级，并提供手机端日志查看助手。
  提供日志备份及崩溃捕捉等功能
  
+ DWLog() 此Log模式不受过滤器影响，任何情况下均高亮显示
+ DWLogNormal() 此模式为普通日志模式，可以通过过滤器过滤掉此类日志以方便查看重要信息（默认情况下NSLog会被替换为此模式日志）
+ DWLogInfo() 此模式为信息模式，输出重要信息，可通过过滤器控制显隐
+ DWLogWarning() 此模式为警告模式，输出警告信息，可通过过滤器控制显隐
+ DWLogError() 此模式为错误模式，输出错误信息，可通过过滤器控制显隐
+ 
+ 请在Appdelegate中程序启动后调用[DWLogManager configDefaultLogger]进行日志捕捉。若想在Debug模式下手机崩溃日志可调用[DWLogManager configToCollectCrash]进行手机。
+ 
+ 其他一些辅助工具属性请查看DWLogManager中属性注释并合理使用。
+ 
  version 1.0.0
  提供不同等级日志输出
  提供手机端日志查看助手
@@ -32,6 +42,11 @@
  修复tableView的header、footer高度适配
  适配iOS8
  
+ version 1.0.3
+ 增加DWLogNormal()模式，并以此替换系统日志，方便过滤基本日志
+ 崩溃日志增加设备的基本信息
+ 搜索模式忽略大小写
+ 
  */
 
 #ifndef DWLogger_h
@@ -41,20 +56,29 @@
 #import "DWLogView.h"
 
 #if DEBUG
-#define DevEvn//开发环境标识符
+///开发环境标识符
+///Develop Environment Flag
+#define DevEvn
 #endif
 
 #ifndef ReplaceSystemLog
-#define ReplaceSystemLog///替换NSLog日志标识符，若无需替换系统日志，注释掉此宏定义
+///替换NSLog日志标识符，若无需替换系统日志，注释掉此宏定义
+///The flag that indicates whether replace NSLog with DWLogNormal.If there hasn't any need to replace,just annotate this flag.
+#define ReplaceSystemLog
 #endif
 
 #ifdef ReplaceSystemLog
-#define NSLog(...) DWLog(__VA_ARGS__)
+#define NSLog(...) DWLogNormal(__VA_ARGS__)
 #endif
 
 #define DWLog(...) \
 do {\
     DWLogWithFilter(DWLoggerAll,__VA_ARGS__);\
+} while (0)
+
+#define DWLogNormal(...) \
+do {\
+DWLogWithFilter(DWLoggerNormal,__VA_ARGS__);\
 } while (0)
 
 #define DWLogInfo(...) \
@@ -80,6 +104,9 @@ DWLogManager * logger = [DWLogManager shareLogManager];\
 NSString * log = [NSString stringWithFormat:__VA_ARGS__];\
 NSString * filterStr = nil;\
 switch (f) {\
+case DWLoggerNormal:\
+filterStr = @"NORMAL: ";\
+break;\
 case DWLoggerInfo:\
 filterStr = @"INFO: ";\
 break;\
