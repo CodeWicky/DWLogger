@@ -67,7 +67,8 @@ static DWLogManager * mgr = nil;
             r = [prefix rangeOfString:@"ERROR"];
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
         } else if (filter == DWLoggerAll) {
-            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, aStr.length)];
+            r = [aStr.string rangeOfString:log];
+            [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:r];
         }
         model.absoluteLog = log;
         model.logString = aStr;
