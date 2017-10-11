@@ -7,14 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9ADF4B002F668829156088A9 /* libPods-DWLogger.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3FBA6F16FD830C8B5CEC6C2 /* libPods-DWLogger.a */; };
 		9B1592F41F83D3F3003ECA7E /* NSArray+DWArrayUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592DB1F83D3F2003ECA7E /* NSArray+DWArrayUtils.m */; };
-		9B1592F51F83D3F3003ECA7E /* DWCheckBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592DE1F83D3F3003ECA7E /* DWCheckBox.m */; };
-		9B1592F61F83D3F3003ECA7E /* DWCheckBoxBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B1592DF1F83D3F3003ECA7E /* DWCheckBoxBundle.bundle */; };
 		9B1592F71F83D3F3003ECA7E /* DWFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592E21F83D3F3003ECA7E /* DWFileManager.m */; };
-		9B1592F81F83D3F3003ECA7E /* DWOperationCancelFlag.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592E51F83D3F3003ECA7E /* DWOperationCancelFlag.m */; };
-		9B1592F91F83D3F3003ECA7E /* DWTableViewHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592E71F83D3F3003ECA7E /* DWTableViewHelper.m */; };
-		9B1592FA1F83D3F3003ECA7E /* DWTableViewHelperResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B1592E81F83D3F3003ECA7E /* DWTableViewHelperResource.bundle */; };
-		9B1592FB1F83D3F3003ECA7E /* DWTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592EA1F83D3F3003ECA7E /* DWTransaction.m */; };
 		9B1592FC1F83D3F3003ECA7E /* UIView+DWViewUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592ED1F83D3F3003ECA7E /* UIView+DWViewUtils.m */; };
 		9B1592FD1F83D3F3003ECA7E /* DWLoggerBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B1592EF1F83D3F3003ECA7E /* DWLoggerBundle.bundle */; };
 		9B1592FE1F83D3F3003ECA7E /* DWLogManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1592F11F83D3F3003ECA7E /* DWLogManager.m */; };
@@ -48,20 +43,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3BE2D13F5958B27F6C86EA4E /* Pods-DWLogger.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DWLogger.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DWLogger/Pods-DWLogger.debug.xcconfig"; sourceTree = "<group>"; };
 		9B1592DA1F83D3F2003ECA7E /* NSArray+DWArrayUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+DWArrayUtils.h"; sourceTree = "<group>"; };
 		9B1592DB1F83D3F2003ECA7E /* NSArray+DWArrayUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+DWArrayUtils.m"; sourceTree = "<group>"; };
-		9B1592DD1F83D3F3003ECA7E /* DWCheckBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWCheckBox.h; sourceTree = "<group>"; };
-		9B1592DE1F83D3F3003ECA7E /* DWCheckBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWCheckBox.m; sourceTree = "<group>"; };
-		9B1592DF1F83D3F3003ECA7E /* DWCheckBoxBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DWCheckBoxBundle.bundle; sourceTree = "<group>"; };
 		9B1592E11F83D3F3003ECA7E /* DWFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWFileManager.h; sourceTree = "<group>"; };
 		9B1592E21F83D3F3003ECA7E /* DWFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWFileManager.m; sourceTree = "<group>"; };
-		9B1592E41F83D3F3003ECA7E /* DWOperationCancelFlag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWOperationCancelFlag.h; sourceTree = "<group>"; };
-		9B1592E51F83D3F3003ECA7E /* DWOperationCancelFlag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWOperationCancelFlag.m; sourceTree = "<group>"; };
-		9B1592E61F83D3F3003ECA7E /* DWTableViewHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWTableViewHelper.h; sourceTree = "<group>"; };
-		9B1592E71F83D3F3003ECA7E /* DWTableViewHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWTableViewHelper.m; sourceTree = "<group>"; };
-		9B1592E81F83D3F3003ECA7E /* DWTableViewHelperResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DWTableViewHelperResource.bundle; sourceTree = "<group>"; };
-		9B1592E91F83D3F3003ECA7E /* DWTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWTransaction.h; sourceTree = "<group>"; };
-		9B1592EA1F83D3F3003ECA7E /* DWTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWTransaction.m; sourceTree = "<group>"; };
 		9B1592EC1F83D3F3003ECA7E /* UIView+DWViewUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+DWViewUtils.h"; sourceTree = "<group>"; };
 		9B1592ED1F83D3F3003ECA7E /* UIView+DWViewUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+DWViewUtils.m"; sourceTree = "<group>"; };
 		9B1592EE1F83D3F3003ECA7E /* DWLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWLogger.h; sourceTree = "<group>"; };
@@ -88,6 +74,8 @@
 		9B2FA0F31F7A276100AAC6CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9BBD55721F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+DWDeviceUtils.h"; sourceTree = "<group>"; };
 		9BBD55731F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+DWDeviceUtils.m"; sourceTree = "<group>"; };
+		A3FBA6F16FD830C8B5CEC6C2 /* libPods-DWLogger.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DWLogger.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC7128D836E4B4E185B3B918 /* Pods-DWLogger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DWLogger.release.xcconfig"; path = "Pods/Target Support Files/Pods-DWLogger/Pods-DWLogger.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9ADF4B002F668829156088A9 /* libPods-DWLogger.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,9 +124,7 @@
 			children = (
 				9BBD55711F8B8A0A0014D8EA /* DWDeviceUtils */,
 				9B1592D91F83D3F2003ECA7E /* DWArrayUtils */,
-				9B1592DC1F83D3F2003ECA7E /* DWCheckBox */,
 				9B1592E01F83D3F3003ECA7E /* DWFileManager */,
-				9B1592E31F83D3F3003ECA7E /* DWTableViewHelper */,
 				9B1592EB1F83D3F3003ECA7E /* DWViewUtils */,
 			);
 			path = Dependence;
@@ -152,16 +139,6 @@
 			path = DWArrayUtils;
 			sourceTree = "<group>";
 		};
-		9B1592DC1F83D3F2003ECA7E /* DWCheckBox */ = {
-			isa = PBXGroup;
-			children = (
-				9B1592DD1F83D3F3003ECA7E /* DWCheckBox.h */,
-				9B1592DE1F83D3F3003ECA7E /* DWCheckBox.m */,
-				9B1592DF1F83D3F3003ECA7E /* DWCheckBoxBundle.bundle */,
-			);
-			path = DWCheckBox;
-			sourceTree = "<group>";
-		};
 		9B1592E01F83D3F3003ECA7E /* DWFileManager */ = {
 			isa = PBXGroup;
 			children = (
@@ -169,20 +146,6 @@
 				9B1592E21F83D3F3003ECA7E /* DWFileManager.m */,
 			);
 			path = DWFileManager;
-			sourceTree = "<group>";
-		};
-		9B1592E31F83D3F3003ECA7E /* DWTableViewHelper */ = {
-			isa = PBXGroup;
-			children = (
-				9B1592E41F83D3F3003ECA7E /* DWOperationCancelFlag.h */,
-				9B1592E51F83D3F3003ECA7E /* DWOperationCancelFlag.m */,
-				9B1592E61F83D3F3003ECA7E /* DWTableViewHelper.h */,
-				9B1592E71F83D3F3003ECA7E /* DWTableViewHelper.m */,
-				9B1592E81F83D3F3003ECA7E /* DWTableViewHelperResource.bundle */,
-				9B1592E91F83D3F3003ECA7E /* DWTransaction.h */,
-				9B1592EA1F83D3F3003ECA7E /* DWTransaction.m */,
-			);
-			path = DWTableViewHelper;
 			sourceTree = "<group>";
 		};
 		9B1592EB1F83D3F3003ECA7E /* DWViewUtils */ = {
@@ -201,6 +164,8 @@
 				9B2FA0E51F7A276100AAC6CF /* DWLoggerTests */,
 				9B2FA0F01F7A276100AAC6CF /* DWLoggerUITests */,
 				9B2FA0CB1F7A276100AAC6CF /* Products */,
+				A5BFE68C38F9A5F9B85186AC /* Pods */,
+				D5608DC73AB41FB58D01B174 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -258,6 +223,23 @@
 			path = DWDeviceUtils;
 			sourceTree = "<group>";
 		};
+		A5BFE68C38F9A5F9B85186AC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3BE2D13F5958B27F6C86EA4E /* Pods-DWLogger.debug.xcconfig */,
+				CC7128D836E4B4E185B3B918 /* Pods-DWLogger.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		D5608DC73AB41FB58D01B174 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A3FBA6F16FD830C8B5CEC6C2 /* libPods-DWLogger.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -265,9 +247,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9B2FA0F61F7A276100AAC6CF /* Build configuration list for PBXNativeTarget "DWLogger" */;
 			buildPhases = (
+				86E01DE4AD6D1D0A6ABF4765 /* [CP] Check Pods Manifest.lock */,
 				9B2FA0C61F7A276100AAC6CF /* Sources */,
 				9B2FA0C71F7A276100AAC6CF /* Frameworks */,
 				9B2FA0C81F7A276100AAC6CF /* Resources */,
+				CF6186BE09A043E2DBE3B6AD /* [CP] Embed Pods Frameworks */,
+				932D6BCCB41508189C106F96 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -364,12 +349,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B1592FA1F83D3F3003ECA7E /* DWTableViewHelperResource.bundle in Resources */,
 				9B2FA0DA1F7A276100AAC6CF /* LaunchScreen.storyboard in Resources */,
 				9B2FA0D71F7A276100AAC6CF /* Assets.xcassets in Resources */,
 				9B2FA0D51F7A276100AAC6CF /* Main.storyboard in Resources */,
 				9B1592FD1F83D3F3003ECA7E /* DWLoggerBundle.bundle in Resources */,
-				9B1592F61F83D3F3003ECA7E /* DWCheckBoxBundle.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,24 +372,75 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		86E01DE4AD6D1D0A6ABF4765 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DWLogger-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		932D6BCCB41508189C106F96 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-DWLogger/Pods-DWLogger-resources.sh",
+				"${PODS_ROOT}/DWCheckBox/DWCheckBox/DWCheckBoxBundle.bundle",
+				"${PODS_ROOT}/DWTableViewHelper/DWTableViewHelper/DWTableViewHelperResource.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DWLogger/Pods-DWLogger-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CF6186BE09A043E2DBE3B6AD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DWLogger/Pods-DWLogger-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		9B2FA0C61F7A276100AAC6CF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				9B2FA0D21F7A276100AAC6CF /* ViewController.m in Sources */,
-				9B1592F81F83D3F3003ECA7E /* DWOperationCancelFlag.m in Sources */,
-				9B1592FB1F83D3F3003ECA7E /* DWTransaction.m in Sources */,
 				9B2FA0DD1F7A276100AAC6CF /* main.m in Sources */,
 				9B1592FC1F83D3F3003ECA7E /* UIView+DWViewUtils.m in Sources */,
 				9B2FA0CF1F7A276100AAC6CF /* AppDelegate.m in Sources */,
-				9B1592F91F83D3F3003ECA7E /* DWTableViewHelper.m in Sources */,
 				9BBD55741F8B8A0A0014D8EA /* UIDevice+DWDeviceUtils.m in Sources */,
 				9B1592F41F83D3F3003ECA7E /* NSArray+DWArrayUtils.m in Sources */,
 				9B1592FE1F83D3F3003ECA7E /* DWLogManager.m in Sources */,
 				9B1592F71F83D3F3003ECA7E /* DWFileManager.m in Sources */,
 				9B1592FF1F83D3F3003ECA7E /* DWLogView.m in Sources */,
-				9B1592F51F83D3F3003ECA7E /* DWCheckBox.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -567,6 +601,7 @@
 		};
 		9B2FA0F71F7A276100AAC6CF /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3BE2D13F5958B27F6C86EA4E /* Pods-DWLogger.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -582,6 +617,7 @@
 		};
 		9B2FA0F81F7A276100AAC6CF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC7128D836E4B4E185B3B918 /* Pods-DWLogger.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;

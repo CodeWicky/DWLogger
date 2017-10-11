@@ -1,0 +1,15 @@
+PODS:
+  - DWCheckBox (1.0.3)
+  - DWTableViewHelper (1.1.5)
+
+DEPENDENCIES:
+  - DWCheckBox (~> 1.0.3)
+  - DWTableViewHelper (~> 1.1.5)
+
+SPEC CHECKSUMS:
+  DWCheckBox: 566e20f6097a1013dc159ed0b619b3d2fff07468
+  DWTableViewHelper: af5866b9661c78b8df453c68dc0db2233d8a36ad
+
+PODFILE CHECKSUM: 6b19ab5080f144b9f7cfabca097164671fb9eafc
+
+COCOAPODS: 1.4.0.beta.1

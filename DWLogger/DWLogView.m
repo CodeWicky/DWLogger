@@ -715,7 +715,9 @@ static DWLogView * loggerView = nil;
             [defaultSelect addObject:@3];
         }
         _checkView = [[DWCheckBoxView alloc] initWithFrame:CGRectMake(0, 0, 100, CheckViewHeight) multiSelect:YES titles:@[@"Normal",@"Info",@"Warning",@"Error"] defaultSelect:defaultSelect];
-        _checkView.backgroundColor = [UIColor colorWithWhite:1 alpha:1];
+        _checkView.backgroundColor = [UIColor whiteColor];
+        _checkView.layer.borderColor = [UIColor blackColor].CGColor;
+        _checkView.layer.borderWidth = 1;
         _checkView.layer.cornerRadius = 10;
         _checkView.clipsToBounds = YES;
     }
