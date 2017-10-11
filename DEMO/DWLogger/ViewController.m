@@ -8,10 +8,6 @@
 
 #import "ViewController.h"
 #import "DWLogger.h"
-#import "DWLogView.h"
-#import "AppDelegate.h"
-#import "DWCheckBox.h"
-#import "UIView+DWViewUtils.h"
 #import "UIDevice+DWDeviceUtils.h"
 @interface ViewController ()
 

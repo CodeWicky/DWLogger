@@ -7,7 +7,7 @@
 //
 
 #import "DWLogView.h"
-#import "DWCheckBox.h"
+#import <DWCheckBox.h>
 #import "DWLogger.h"
 #import "NSArray+DWArrayUtils.h"
 #import "UIView+DWViewUtils.h"
