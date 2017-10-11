@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name = 'DWLogger'
-s.version = '0.0.41'
+s.version = '0.0.42'
 s.license = { :type => 'MIT', :file => 'LICENSE' }
 s.summary = '这是一个日志助手类，他可以帮助你在App中直接查看输出的日志。This is a Log Helper Class which enable you read logs in your App on screen directly.'
 s.homepage = 'https://github.com/CodeWicky/DWLogger'

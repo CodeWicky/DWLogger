@@ -13,7 +13,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "DWTableViewHelper.h"
+#import <DWTableViewHelper/DWTableViewHelper.h>
 #import "DWLogManager.h"
 
 @class DWLogModel;
