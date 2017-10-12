@@ -10,6 +10,7 @@
 #import "DWLogger.h"
 #import "DWFileManager.h"
 #import "UIDevice+DWDeviceUtils.h"
+#import "DWCrashCollector.h"
 
 #define FilePath [NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
 
@@ -143,7 +144,8 @@ static DWLogManager * mgr = nil;
 #ifndef DevEvn
     return;
 #endif
-    NSSetUncaughtExceptionHandler(&exceptionHandler);
+//    NSSetUncaughtExceptionHandler(&exceptionHandler);
+    [DWCrashCollector CollectCrashInDefaultWithSavePath:FilePath];
 }
 
 static void exceptionHandler(NSException *exception)
@@ -169,7 +171,7 @@ static void exceptionHandler(NSException *exception)
     crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Detail:\n%@",exception.debugDescription]];
     writeDataString2File(crashStr, crashFilePath, NULL);
     saveCrashImage2Path(path);
-    printf("\nCrash Log Path Is %s\n\n",[crashFilePath cStringUsingEncoding:NSUTF8StringEncoding]);
+    printf("\nCrash Log Path Is %s\n\n",crashFilePath.UTF8String);
 }
 
 #pragma mark --- tool method ---

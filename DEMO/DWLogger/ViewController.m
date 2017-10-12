@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "DWLogger.h"
 #import "UIDevice+DWDeviceUtils.h"
+#import <CoreText/CoreText.h>
 @interface ViewController ()
 
 @end
@@ -43,8 +44,18 @@
         flag = YES;
         return;
     }
+
     
+    
+//    abort();
     [@[] objectAtIndex:1];
+//    void *pc = malloc(1024);
+//    free(pc);
+//    free(pc);
+//
+//    CTFramesetterRef frameSetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)CFBridgingRetain([[NSAttributedString alloc] initWithString:@"a"]));
+//    CFRelease(frameSetter);
+//    CFRelease(frameSetter);
 }
 
 - (void)didReceiveMemoryWarning {

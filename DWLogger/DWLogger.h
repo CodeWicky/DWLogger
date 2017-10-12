@@ -134,7 +134,7 @@ prefix = [prefix stringByAppendingString:[NSString stringWithFormat:@"[%@",file]
 prefix = [prefix stringByAppendingString:[NSString stringWithFormat:@" line:%d method:%@] ",__LINE__,NSStringFromSelector(_cmd)]];\
 prefix = [prefix stringByAppendingString:filterStr];\
 if (logger.logFilter & f) {\
-printf("%s%s\n",[prefix cStringUsingEncoding:NSUTF8StringEncoding],[log cStringUsingEncoding:NSUTF8StringEncoding]);\
+printf("%s%s\n",prefix.UTF8String,log.UTF8String);\
 }\
 if (!logger.disableLogger) {\
 if (!logger.particularLog) {\
