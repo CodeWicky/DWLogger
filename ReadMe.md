@@ -2,9 +2,9 @@
 <font size="20">DWLogger</font>
 </p>
 
-<!--<p align="center" >
+<p align="center" >
   <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E5%8A%A8%E7%94%BB%E5%B1%95%E7%A4%BA.gif" alt="DWLogger" title="DWLogger">
-</p>-->
+</p>
 
 ## 描述
 这是一个日志助手类，他可以帮助你在App中直接查看输出的日志，同时不影响电脑端的日志输出。
