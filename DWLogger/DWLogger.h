@@ -30,22 +30,26 @@
  提供日志备份及崩溃捕捉功能
  Release模式下屏蔽所有功能
  
- version 1.0.1
+ version 1.0.0.1
  添加NSLog替换为DWLog的日志替换宏
  DWLog中日志输出函数改为printf函数，防止NSLog宏的循环调用
  修复不选详细日志模式时模式前缀颜色失效问题
  
- version 1.0.2
+ version 1.0.0.2
  过滤器逻辑修改
  添加日志搜索模式相关逻辑
  添加iOS11适配
  修复tableView的header、footer高度适配
  适配iOS8
  
- version 1.0.3
+ version 1.0.0.3
  增加DWLogNormal()模式，并以此替换系统日志，方便过滤基本日志
  崩溃日志增加设备的基本信息
  搜索模式忽略大小写
+ 
+ version 1.0.1
+ 修改崩溃日志保存策略，以防保存失败，同时添加崩溃截图
+ 添加删除崩溃日志API
  
  */
 

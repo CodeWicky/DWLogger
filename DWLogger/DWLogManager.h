@@ -112,6 +112,10 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
 ///Remove all Log Backups on disk.
 +(void)removeAllLogBackUp;
 
+///删除所有本地崩溃日志
+///Remove all Crash Backups on disk.
++(void)removeAllCrashBackUp;
+
 ///删除本次当前本地日志
 ///Remove current Log Backup on disk.
 +(void)removeCurrentLogBackUp;

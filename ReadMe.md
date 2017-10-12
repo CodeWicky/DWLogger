@@ -48,8 +48,38 @@ In more cases,it helps you read logs without connecting with computer,which help
 到了这里，你已经开始使用DWLogger了，Logger会自动替换NSLog为DWLogNormal，所以你的所有日志都会被Logger接收。不仅在电脑端有日志输出，App端同样也有。
 
 一般状态下他是这个样子：
+ <p align="center" >
+  <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E6%94%B6%E8%B5%B7%E7%8A%B6%E6%80%81.png" alt="Normal" title="Normal">
 
+点击加号会展开菜单：
+<p align="center" >
+  <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E5%B1%95%E5%BC%80.png" alt="Expand" title="Expand">
+  
+从右向左总共五个按钮，我依次介绍：
 
+右数第一个：收起状态按钮
+> 收起菜单至收起状态，也就是一般状态。
+
+右数第二个：展示日志按钮
+> 图例中为不可见状态，即不展示屏幕日志。点击后为可见状态，即展示屏幕日志。
+
+<p align="center" >
+  <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E6%97%A5%E5%BF%97%E7%AD%89%E7%BA%A7.png" alt="Expand" title="Expand">
+
+上图即是展示屏幕日志的状态，当然不会有那个等级菜单。
+
+右数第三个：响应控制按钮
+> 图例中为接受响应状态，及手势等控制均由屏幕日志窗口接收。点击后为拒绝响应状态，该状态屏幕日志窗口不接收响应事件，由App端接收响应。（不展示屏幕日志状态下响应控制按钮失效且默认有App端接收响应）
+
+右数第四个：清除当前屏幕日志
+> 点击后清除当前屏幕日志（不影响备份至磁盘的日志）
+
+右数第五个：日志等级选择
+> 点击后展示等级选择菜单，选择将要查看的日志等级，勾选中的等级展示，未勾选的屏蔽。再次点击或者点击屏幕中任意非按钮位置收起等级选择菜单，屏蔽日志生效。
+
+<p align="center" >
+  <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E5%B1%8F%E8%94%BD%E6%97%A5%E5%BF%97.png" alt="Shield" title="Shield">
+  
 DWLogger提供了5个日志等级：
 > DWLog(@"全局");
 >
@@ -59,4 +89,13 @@ DWLogger提供了5个日志等级：
 > 
 > DWLogWarning(@"警告");
 > 
-> DWLogError(@"错误");
+> DWLogError(@"错误"); 
+
+通过调用五个等级的API来决定日志等级。  
+
+除了五个按钮，上方还有搜索栏，用来以关键字搜索日志。
+
+<p align="center" >
+  <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E6%90%9C%E7%B4%A2%E6%97%A5%E5%BF%97.png" alt="Search" title="Search">
+  
+注，此处搜索日志范围为搜索前展示范围，即搜索前仅展示全局Log及NormalLog，则搜索范围也为该范围。

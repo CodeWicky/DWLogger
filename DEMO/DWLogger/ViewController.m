@@ -20,6 +20,10 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
+    UIView * red = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
+    [self.view addSubview:red];
+    red.backgroundColor = [UIColor redColor];
+    
     DWLogInfo(@"1.%@", @"asd");
     DWLogError(@"2.errer %d",2);
     DWLogWarning(@"3.%d - %d",1,2);
@@ -32,15 +36,15 @@
     NSLog(@"%@",infoDictionary);
 }
 
--(void)aBtnAction:(UIButton *)sender
-{
-    DWLog(@"click");
-}
-
--(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {    
-    DWLogInfo(@"1.%@", @"asd");
-    DWLogWarning(@"3.%d - %d",1,2);
-    DWLogError(@"2.errer %d",2);
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    static BOOL flag = NO;
+    if (!flag) {
+        [DWLogManager removeAllCrashBackUp];
+        flag = YES;
+        return;
+    }
+    
+    [@[] objectAtIndex:1];
 }
 
 - (void)didReceiveMemoryWarning {

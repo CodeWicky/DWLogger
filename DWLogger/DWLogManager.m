@@ -98,6 +98,10 @@ static DWLogManager * mgr = nil;
     [DWFileManager dw_ClearDirectoryAtPath:[DWLogManager shareLogManager].filePath];
 }
 
++(void)removeAllCrashBackUp {
+    [DWFileManager dw_ClearDirectoryAtPath:[FilePath stringByAppendingPathComponent:@"Crash"]];
+}
+
 +(void)removeCurrentLogBackUp {
     [DWFileManager dw_RemoveItemAtPath:[DWLogManager shareLogManager].logFilePath];
 }
@@ -128,11 +132,11 @@ static DWLogManager * mgr = nil;
 }
 
 +(void)printCallStackSymbols {
-    DWLog(@"%@",[NSThread callStackSymbols]);
+    DWLog(@"Call Stack Symbols are :\n%@",[NSThread callStackSymbols]);
 }
 
 +(void)printLoggerMainPath {
-    DWLog(@"%@",FilePath);
+    DWLog(@"Logger main path is :\n%@",FilePath);
 }
 
 +(void)configToCollectCrash {
@@ -147,10 +151,9 @@ static void exceptionHandler(NSException *exception)
     NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyyMMdd-HHmmss"];
     NSDate * date = [NSDate date];
-    NSString * crashFileName = [formatter stringFromDate:date];
-    crashFileName = [crashFileName stringByAppendingString:@".crash"];
-    NSString * path = [FilePath stringByAppendingPathComponent:@"Crash"];
-    NSString * crashFilePath = [path stringByAppendingPathComponent:crashFileName];
+    NSString * folderName = [formatter stringFromDate:date];
+    NSString * path = [FilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"Crash/%@",folderName]];
+    NSString * crashFilePath = [path stringByAppendingPathComponent:@"CrashLog.crash"];
     [DWFileManager dw_CreateFileAtPath:crashFilePath];
     [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     NSString * timeStr = [formatter stringFromDate:date];
@@ -164,7 +167,8 @@ static void exceptionHandler(NSException *exception)
     crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device System: %@\n",[UIDevice dw_DeviceSystemVersion]]];
     crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device CPU Arch: %@\n",[UIDevice dw_DeviceCPUType]]];
     crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Detail:\n%@",exception.debugDescription]];
-    writeDataString2File(crashStr, crashFilePath, dispatch_queue_create("com.crashQueue.DWLogManager", DISPATCH_QUEUE_SERIAL));
+    writeDataString2File(crashStr, crashFilePath, NULL);
+    saveCrashImage2Path(path);
     printf("\nCrash Log Path Is %s\n\n",[crashFilePath cStringUsingEncoding:NSUTF8StringEncoding]);
 }
 
@@ -206,12 +210,25 @@ static void exceptionHandler(NSException *exception)
 
 #pragma mark --- inline method ---
 static inline void writeDataString2File(NSString * data,NSString * path,dispatch_queue_t queue) {
-    dispatch_async(queue, ^{
+    void(^block)(void) = ^(void) {
         NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
         [file seekToEndOfFile];
         [file writeData:[data dataUsingEncoding:NSUTF8StringEncoding]];
         [file closeFile];
-    });
+    };
+    if (queue == NULL) {
+        block();
+    } else {
+        dispatch_async(queue, block);
+    }
+}
+
+static inline void saveCrashImage2Path(NSString * path) {
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds),CGRectGetHeight([UIScreen mainScreen].bounds)),NO,1);
+    [[UIApplication sharedApplication].keyWindow  drawViewHierarchyInRect:CGRectMake(0,0,CGRectGetWidth([UIScreen mainScreen].bounds),CGRectGetHeight([UIScreen mainScreen].bounds))afterScreenUpdates:NO];
+    UIImage *snapshot =UIGraphicsGetImageFromCurrentImageContext();
+    [UIImageJPEGRepresentation(snapshot,1.0)writeToFile:[NSString stringWithFormat:@"%@/%@",path,@"CrashSnap.jpg"] atomically:YES];
+    UIGraphicsEndImageContext();
 }
 
 #pragma mark --- setter/getter ---
