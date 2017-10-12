@@ -60,8 +60,6 @@ static void (^expHandler)(NSException * exp);
 +(void)configToCollectCrashWithSavePath:(NSString *)savePath handler:(void (^)(NSException *))handler {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sP = savePath;
-        expHandler = handler;
         uninstallCollector();
         installCollector(savePath,handler);
     });

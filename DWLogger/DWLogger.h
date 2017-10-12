@@ -55,6 +55,9 @@
  version 1.0.2
  完善崩溃捕捉，捕捉异常与信号类崩溃
  
+ version 1.0.2.1
+ 冗余代码删除
+ 
  */
 
 #ifndef DWLogger_h
