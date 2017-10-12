@@ -3,7 +3,7 @@
 </p>
 
 <p align="center" >
-  <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E5%8A%A8%E7%94%BB%E5%B1%95%E7%A4%BA.gif" alt="DWLogger" title="DWLogger">
+  <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E5%8A%A8%E7%94%BB%E5%B1%95%E7%A4%BA.gif" width=414px height=736px alt="DWLogger" title="DWLogger">
 </p>
 
 ## 描述
