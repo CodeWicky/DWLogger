@@ -10,7 +10,6 @@
 #import <DWCheckBox/DWCheckBox.h>
 #import "DWLogger.h"
 #import "NSArray+DWArrayUtils.h"
-#import "UIView+DWViewUtils.h"
 
 #define BtnLength 44
 #define BtnSpacing 20
@@ -218,7 +217,7 @@ static DWFloatPot * pot = nil;
 #pragma mark --- setter/getter ---
 -(UITableView *)mainTab {
     if (!_mainTab) {
-        _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, self.searchController.searchBar.height, self.view.width, self.view.height - self.searchController.searchBar.height) style:(UITableViewStylePlain)];
+        _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, self.searchController.searchBar.bounds.size.height, self.view.bounds.size.width, self.view.bounds.size.height - self.searchController.searchBar.bounds.size.height) style:(UITableViewStylePlain)];
         self.helper = [[DWTableViewHelper alloc] initWithTabV:_mainTab dataSource:self.dataArr];
         self.helper.useAutoRowHeight = YES;
         _mainTab.backgroundColor = [UIColor clearColor];
@@ -425,8 +424,8 @@ static DWLogView * loggerView = nil;
 @implementation DWFloatPotViewController
 
 -(void)viewDidLoad {
-    self.width = self.view.width;
-    self.height = self.view.height;
+    self.width = self.view.bounds.size.width;
+    self.height = self.view.bounds.size.height;
     CGFloat width = self.width;
     CGFloat height = self.height;
     CGRect switchBtnR = btnRectWithOrigin(width - BtnLength,height - BtnLength - 30);
@@ -587,11 +586,11 @@ static DWLogView * loggerView = nil;
     CGFloat x1 = 0;
     CGFloat x2 = 0;
     if (self.switchBtn.center.x > self.view.center.x) {
-        x1 = self.containerView.right;
+        x1 = CGRectGetMaxX(self.containerView.frame);
         x2 = frame.origin.x;
     } else {
         x1 = CGRectGetMaxX(frame);
-        x2 = self.containerView.left;
+        x2 = CGRectGetMinX(self.containerView.frame);
     }
     [UIView animateWithDuration:time delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
         self.containerView.frame = CGRectMake(x2, self.switchBtn.center.y - BtnLength / 2.0, ABS(x1 - x2), BtnLength);
@@ -625,7 +624,7 @@ static DWLogView * loggerView = nil;
     
     x = self.switchBtn.center.x - BtnLength / 2.0;
     [UIView animateWithDuration:totalTime delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
-        self.containerView.frame = CGRectMake(x, self.containerView.originY, BtnLength, BtnLength);
+        self.containerView.frame = CGRectMake(x, self.containerView.frame.origin.y, BtnLength, BtnLength);
     } completion:nil];
 }
 
@@ -639,7 +638,7 @@ static DWLogView * loggerView = nil;
     CGFloat y = self.modeBtn.frame.origin.y - 10 - CheckViewHeight;
     if (self.modeBtn.center.y < self.view.center.y) {
         upwards = NO;
-        y = self.modeBtn.bottom + 10;
+        y = CGRectGetMaxY(self.modeBtn.frame) + 10;
     }
     CGFloat x = self.modeBtn.center.x - self.checkView.bounds.size.width / 2.0;
     CGFloat tempY = self.modeBtn.frame.origin.y - 10;
@@ -662,7 +661,7 @@ static DWLogView * loggerView = nil;
     CGFloat x = self.modeBtn.center.x - self.checkView.bounds.size.width / 2.0;
     BOOL upwards = YES;
     if (self.modeBtn.center.y < self.view.center.y) {
-        y = self.modeBtn.bottom + 10;
+        y = CGRectGetMaxY(self.modeBtn.frame) + 10;
         upwards = NO;
     }
     [UIView animateWithDuration:0.4 animations:^{
