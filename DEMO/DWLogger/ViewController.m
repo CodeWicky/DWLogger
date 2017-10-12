@@ -8,8 +8,7 @@
 
 #import "ViewController.h"
 #import "DWLogger.h"
-#import "UIDevice+DWDeviceUtils.h"
-#import <CoreText/CoreText.h>
+
 @interface ViewController ()
 
 @end
@@ -25,37 +24,17 @@
     [self.view addSubview:red];
     red.backgroundColor = [UIColor redColor];
     
-    DWLogInfo(@"1.%@", @"asd");
-    DWLogError(@"2.errer %d",2);
-    DWLogWarning(@"3.%d - %d",1,2);
-    DWLogWarning(@"8765432");
-    [DWLogManager printLoggerMainPath];
-    
-    DWLogInfo(@"%@",[UIDevice dw_DevelopSDKVersion]);
-    
-    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-    NSLog(@"%@",infoDictionary);
+    DWLog(@"全局");
+    DWLogNormal(@"普通");
+    DWLogInfo(@"信息");
+    DWLogWarning(@"警告");
+    DWLogError(@"错误");
+    NSLog(@"系统");
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    static BOOL flag = NO;
-    if (!flag) {
-        [DWLogManager removeAllCrashBackUp];
-        flag = YES;
-        return;
-    }
-
-    
-    
-//    abort();
-    [@[] objectAtIndex:1];
-//    void *pc = malloc(1024);
-//    free(pc);
-//    free(pc);
-//
-//    CTFramesetterRef frameSetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)CFBridgingRetain([[NSAttributedString alloc] initWithString:@"a"]));
-//    CFRelease(frameSetter);
-//    CFRelease(frameSetter);
+//    abort();//此句可导致信号崩溃
+    [@[] objectAtIndex:1];//此句可导致异常崩溃
 }
 
 - (void)didReceiveMemoryWarning {

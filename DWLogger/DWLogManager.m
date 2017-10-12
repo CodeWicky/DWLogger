@@ -144,40 +144,18 @@ static DWLogManager * mgr = nil;
 #ifndef DevEvn
     return;
 #endif
-//    NSSetUncaughtExceptionHandler(&exceptionHandler);
     [DWCrashCollector CollectCrashInDefaultWithSavePath:FilePath];
-}
-
-static void exceptionHandler(NSException *exception)
-{
-    NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyyMMdd-HHmmss"];
-    NSDate * date = [NSDate date];
-    NSString * folderName = [formatter stringFromDate:date];
-    NSString * path = [FilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"Crash/%@",folderName]];
-    NSString * crashFilePath = [path stringByAppendingPathComponent:@"CrashLog.crash"];
-    [DWFileManager dw_CreateFileAtPath:crashFilePath];
-    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    NSString * timeStr = [formatter stringFromDate:date];
-    NSString * crashStr = @"";
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Name: %@\n",[UIDevice dw_ProjectDisplayName]]];
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Bundle ID: %@\n",[UIDevice dw_ProjectBundleId]]];
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Version: %@\n",[UIDevice dw_ProjectVersion]]];
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Build: %@\n",[UIDevice dw_ProjectBuildNo]]];
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Time: %@\n",timeStr]];
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device Model: %@\n",[UIDevice dw_DeviceDetailModel]]];
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device System: %@\n",[UIDevice dw_DeviceSystemVersion]]];
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device CPU Arch: %@\n",[UIDevice dw_DeviceCPUType]]];
-    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Detail:\n%@",exception.debugDescription]];
-    writeDataString2File(crashStr, crashFilePath, NULL);
-    saveCrashImage2Path(path);
-    printf("\nCrash Log Path Is %s\n\n",crashFilePath.UTF8String);
 }
 
 #pragma mark --- tool method ---
 -(void)writeLog2File:(NSString *)log {
     log = [log stringByAppendingString:@"\n"];
-    writeDataString2File(log, self.logFilePath,self.writeFileQueue);
+    dispatch_async(self.writeFileQueue, ^{
+        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:self.logFilePath];
+        [file seekToEndOfFile];
+        [file writeData:[log dataUsingEncoding:NSUTF8StringEncoding]];
+        [file closeFile];
+    });
 }
 
 -(void)configLoggerView:(DWLogView *)logView {
@@ -208,29 +186,6 @@ static void exceptionHandler(NSException *exception)
 
 -(id)mutableCopyWithZone:(struct _NSZone *)zone {
     return self;
-}
-
-#pragma mark --- inline method ---
-static inline void writeDataString2File(NSString * data,NSString * path,dispatch_queue_t queue) {
-    void(^block)(void) = ^(void) {
-        NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-        [file seekToEndOfFile];
-        [file writeData:[data dataUsingEncoding:NSUTF8StringEncoding]];
-        [file closeFile];
-    };
-    if (queue == NULL) {
-        block();
-    } else {
-        dispatch_async(queue, block);
-    }
-}
-
-static inline void saveCrashImage2Path(NSString * path) {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds),CGRectGetHeight([UIScreen mainScreen].bounds)),NO,1);
-    [[UIApplication sharedApplication].keyWindow  drawViewHierarchyInRect:CGRectMake(0,0,CGRectGetWidth([UIScreen mainScreen].bounds),CGRectGetHeight([UIScreen mainScreen].bounds))afterScreenUpdates:NO];
-    UIImage *snapshot =UIGraphicsGetImageFromCurrentImageContext();
-    [UIImageJPEGRepresentation(snapshot,1.0)writeToFile:[NSString stringWithFormat:@"%@/%@",path,@"CrashSnap.jpg"] atomically:YES];
-    UIGraphicsEndImageContext();
 }
 
 #pragma mark --- setter/getter ---

@@ -48,11 +48,17 @@
      All filter Log.
  */
 typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
+    ///忽略模式
     DWLoggerIgnore = 0,
+    ///普通模式
     DWLoggerNormal = 1 << 1,
+    ///信息模式
     DWLoggerInfo = 1 << 2,
+    ///警告模式
     DWLoggerWarning = 1 << 3,
+    ///错误模式
     DWLoggerError = 1 << 4,
+    ///全局模式
     DWLoggerAll = DWLoggerNormal | DWLoggerInfo | DWLoggerWarning | DWLoggerError,
 };
 

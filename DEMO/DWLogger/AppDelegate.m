@@ -9,7 +9,6 @@
 #import "AppDelegate.h"
 #import "ViewController.h"
 #import "DWLogger.h"
-#import "DWCrashCollector.h"
 @interface AppDelegate ()
 
 @end

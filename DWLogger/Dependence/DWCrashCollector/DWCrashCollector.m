@@ -17,9 +17,6 @@ volatile int32_t UncaughtExceptionCount = 0;
 
 const int32_t UncaughtExceptionMaximum = 10;
 
-
-static DWCrashCollector * clt = nil;
-
 static NSString * sP = nil;
 
 static void (^expHandler)(NSException * exp);
@@ -51,19 +48,10 @@ static void (^expHandler)(NSException * exp);
         saveCrashImage2Path(path);
         printf("\nCrash Log Path Is %s\n\n",crashFilePath.UTF8String);
         
-        NSSetUncaughtExceptionHandler(NULL);
-        signal(SIGABRT, SIG_DFL);
-        signal(SIGILL, SIG_DFL);
-        signal(SIGSEGV, SIG_DFL);
-        signal(SIGFPE, SIG_DFL);
-        signal(SIGBUS, SIG_DFL);
-        signal(SIGPIPE, SIG_DFL);
-        if ([[exception name] isEqual:@"DWCrashCollectorSignalErrorName"])
-        {
+        uninstallCollector();
+        if ([[exception name] isEqual:@"DWCrashCollectorSignalErrorName"]) {
             kill(getpid(), [[[exception userInfo] objectForKey:@"DWCrashCollectorSignalKey"] intValue]);
-        }
-        else
-        {
+        } else {
             [exception raise];
         }
     }];
@@ -72,29 +60,11 @@ static void (^expHandler)(NSException * exp);
 +(void)configToCollectCrashWithSavePath:(NSString *)savePath handler:(void (^)(NSException *))handler {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        clt = [self alloc];
-        [clt defaultConfigWithSavePath:savePath handler:handler];
-    });
-}
-
--(instancetype)defaultConfigWithSavePath:(NSString *)savePath handler:(void(^)(NSException * exp))handler {
-    clt = [super init];
-    if (clt) {
         sP = savePath;
         expHandler = handler;
-        [clt configHandler];
-    }
-    return clt;
-}
-
--(void)configHandler {
-    NSSetUncaughtExceptionHandler(&exceptionHandler);
-    signal(SIGABRT, signalCollector);
-    signal(SIGILL, signalCollector);
-    signal(SIGSEGV, signalCollector);
-    signal(SIGFPE, signalCollector);
-    signal(SIGBUS, signalCollector);
-    signal(SIGPIPE, signalCollector);
+        uninstallCollector();
+        installCollector(savePath,handler);
+    });
 }
 
 #pragma mark --- exception Hanlder ---
@@ -103,44 +73,6 @@ static void exceptionHandler(NSException *exception)
     if (expHandler) {
         expHandler(exception);
     }
-//    NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
-//    [formatter setDateFormat:@"yyyyMMdd-HHmmss"];
-//    NSDate * date = [NSDate date];
-//    NSString * folderName = [formatter stringFromDate:date];
-//    NSString * path = [sP stringByAppendingPathComponent:[NSString stringWithFormat:@"Crash/%@",folderName]];
-//    NSString * crashFilePath = [path stringByAppendingPathComponent:@"CrashLog.crash"];
-//    [DWFileManager dw_CreateFileAtPath:crashFilePath];
-//    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-//    NSString * timeStr = [formatter stringFromDate:date];
-//    NSString * crashStr = @"";
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Name: %@\n",[UIDevice dw_ProjectDisplayName]]];
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Bundle ID: %@\n",[UIDevice dw_ProjectBundleId]]];
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Version: %@\n",[UIDevice dw_ProjectVersion]]];
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Build: %@\n",[UIDevice dw_ProjectBuildNo]]];
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Time: %@\n",timeStr]];
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device Model: %@\n",[UIDevice dw_DeviceDetailModel]]];
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device System: %@\n",[UIDevice dw_DeviceSystemVersion]]];
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device CPU Arch: %@\n",[UIDevice dw_DeviceCPUType]]];
-//    crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Detail:\n%@",exception.debugDescription]];
-//    writeDataString2File(crashStr, crashFilePath);
-//    saveCrashImage2Path(path);
-//    printf("\nCrash Log Path Is %s\n\n",crashFilePath.UTF8String);
-//
-//    NSSetUncaughtExceptionHandler(NULL);
-//    signal(SIGABRT, SIG_DFL);
-//    signal(SIGILL, SIG_DFL);
-//    signal(SIGSEGV, SIG_DFL);
-//    signal(SIGFPE, SIG_DFL);
-//    signal(SIGBUS, SIG_DFL);
-//    signal(SIGPIPE, SIG_DFL);
-//    if ([[exception name] isEqual:@"DWCrashCollectorSignalErrorName"])
-//    {
-//        kill(getpid(), [[[exception userInfo] objectForKey:@"DWCrashCollectorSignalKey"] intValue]);
-//    }
-//    else
-//    {
-//        [exception raise];
-//    }
 }
 
 static void signalCollector(int signal)
@@ -153,8 +85,6 @@ static void signalCollector(int signal)
         return;
     }
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:signal] forKey:@"DWCrashCollectorSignalKey"];
-    NSArray *callStack = getBacktrace();
-    [userInfo setObject:callStack forKey:@"DWCrashCollectorBackTrace"];
     
     NSString * signalStr = @"Unknown Signal";
     if (signal == SIGABRT) {
@@ -171,10 +101,9 @@ static void signalCollector(int signal)
         signalStr = @"SIGPIPE";
     }
     
-    NSString * reason = [NSString stringWithFormat:@"%@ error was raised.",
-                         signalStr];
+    NSString * reason = [NSString stringWithFormat:@"%@ error was raised.",signalStr];
     NSException * exc =[NSException exceptionWithName:@"DWCrashCollectorSignalErrorName" reason:reason userInfo:userInfo];
-    exceptionHandler(exc);
+    @throw exc;
 }
 
 #pragma mark --- inline method ---
@@ -194,31 +123,32 @@ static inline void writeDataString2File(NSString * data,NSString * path) {
     [file closeFile];
 }
 
-static inline NSArray * getBacktrace() {
-    void* callstack[128];
-    int frames = backtrace(callstack, 128);
-    char **strs = backtrace_symbols(callstack, frames);
-    int i;
-    NSMutableArray *backtrace = [NSMutableArray arrayWithCapacity:frames];
-    for (i = 0;i < backtrace.count;i++)
-    {
-        [backtrace addObject:[NSString stringWithUTF8String:strs[i]]];
-    }
-    free(strs);
-    return backtrace;
+static inline  void installCollector(NSString * savePath,void(^handler)(NSException * exc)) {
+    sP = savePath;
+    expHandler = handler;
+    NSSetUncaughtExceptionHandler(&exceptionHandler);
+    signal(SIGABRT, signalCollector);
+    signal(SIGILL, signalCollector);
+    signal(SIGSEGV, signalCollector);
+    signal(SIGFPE, signalCollector);
+    signal(SIGBUS, signalCollector);
+    signal(SIGPIPE, signalCollector);
 }
 
+static inline void uninstallCollector() {
+    sP = nil;
+    expHandler = nil;
+    NSSetUncaughtExceptionHandler(NULL);
+    signal(SIGABRT, SIG_DFL);
+    signal(SIGILL, SIG_DFL);
+    signal(SIGSEGV, SIG_DFL);
+    signal(SIGFPE, SIG_DFL);
+    signal(SIGBUS, SIG_DFL);
+    signal(SIGPIPE, SIG_DFL);
+}
 
 #pragma mark --- over write ---
 -(instancetype)init {
-    return nil;
-}
-
--(id)copyWithZone:(struct _NSZone *)zone {
-    return nil;
-}
-
--(id)mutableCopyWithZone:(struct _NSZone *)zone {
     return nil;
 }
 
