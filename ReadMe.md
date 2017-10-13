@@ -123,7 +123,7 @@ Click on the Plus button will expand the menu：
 <p align="center" >
   <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E5%B1%95%E5%BC%80.png" width=207px height=368px alt="Expand" title="Expand">
   
-I will the function of the five button from right to left：
+I will introduce the function of the five buttons from right to left：
 
 No 1. from right：Close the menu.
 > Close the menu to normal state.
