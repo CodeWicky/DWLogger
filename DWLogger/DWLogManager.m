@@ -144,7 +144,7 @@ static DWLogManager * mgr = nil;
 #ifndef DevEvn
     return;
 #endif
-    [DWCrashCollector CollectCrashInDefaultWithSavePath:FilePath];
+    [DWCrashCollector collectCrashInDefaultWithSavePath:FilePath];
 }
 
 #pragma mark --- tool method ---
