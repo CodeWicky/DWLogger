@@ -82,6 +82,10 @@
 #define NSLog(...) DWLogNormal(__VA_ARGS__)
 #endif
 
+///最大日志长度
+///Max length of log,log beyond this range will be ignored
+#define MaxLogLength (1024 * 5)
+
 #define DWLog(...) \
 do {\
     DWLogWithFilter(DWLoggerAll,__VA_ARGS__);\

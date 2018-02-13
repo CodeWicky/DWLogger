@@ -53,7 +53,13 @@ static DWLogManager * mgr = nil;
     DWLogManager * logger = [DWLogManager shareLogManager];
     if (logger.logView) {
         DWLogModel * model = [DWLogModel new];
-        NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@",prefix,log]];
+        NSString * logTemp = [log copy];
+        if (logTemp.length > MaxLogLength) {
+            logTemp = [logTemp substringToIndex:MaxLogLength];
+            NSString * ignoreString = [NSString stringWithFormat:@"The log is too long whose length is more than %d,DWLogger has abstracted it.The abstract is :\n",MaxLogLength];
+            logTemp = [NSString stringWithFormat:@"%@%@...",ignoreString,logTemp];
+        }
+        NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@",prefix,logTemp]];
         NSRange r = NSRangeNull;
         if (filter == DWLoggerNormal) {
             r = [prefix rangeOfString:@"NORMAL"];
@@ -68,7 +74,7 @@ static DWLogManager * mgr = nil;
             r = [prefix rangeOfString:@"ERROR"];
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:r];
         } else if (filter == DWLoggerAll) {
-            r = [aStr.string rangeOfString:log];
+            r = [aStr.string rangeOfString:logTemp];
             [aStr addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:r];
         }
         model.absoluteLog = log;
