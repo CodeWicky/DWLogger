@@ -10,6 +10,7 @@
 #import <DWCheckBox/DWCheckBox.h>
 #import "DWLogger.h"
 #import "NSArray+DWArrayUtils.h"
+#import "DWSearchView.h"
 
 #define BtnLength 44
 #define BtnSpacing 20
@@ -50,7 +51,7 @@
 
 
 
-@interface DWLogViewController : UIViewController<UISearchResultsUpdating>
+@interface DWLogViewController : UIViewController
 
 @property (nonatomic ,strong) UITableView * mainTab;
 
@@ -62,7 +63,11 @@
 
 @property (nonatomic ,assign) BOOL filterLogArrayNeedChange;
 
-@property (nonatomic ,strong) UISearchController * searchController;
+@property (nonatomic ,strong) DWSearchView * searchView;
+
+@property (nonatomic ,strong) NSMutableArray * searchIndexArray;
+
+@property (nonatomic ,assign) NSInteger highlightIndex;
 
 @end
 
@@ -109,7 +114,7 @@ static DWFloatPot * pot = nil;
     return self;
 }
 
-#pragma mark --- overwrite ---
+#pragma mark --- override ---
 -(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     UIView * view = [super hitTest:point withEvent:event];
     if ([view isEqual:self.rootViewController.view]) {///当前响应者为FloatView的rootViewController的根视图
@@ -118,15 +123,7 @@ static DWFloatPot * pot = nil;
             [vc hideCheckView];
             return view;
         }
-        DWLogViewController * logVC = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
-        if (logVC.searchController.searchBar.isFirstResponder) {///如果处于搜索状态，应该释放搜索栏的第一响应者，此时应该是FloatView所属window响应
-            if (!logVC.searchController.searchBar.text.length) {
-                logVC.searchController.active = NO;
-            }
-            [logVC.searchController.searchBar resignFirstResponder];
-            return view;
-        }
-        return nil;///否则没有点击到FloatPot的按钮，应该LogView应该不做响应
+        return nil;///否则没有点击到FloatPot的按钮，应该LogView响应
     }
     return view;///返回不为根视图，则有可能为nil或者FloatView的button。
 }
@@ -149,10 +146,27 @@ static DWFloatPot * pot = nil;
 
 @property (nonatomic ,strong) UILabel * logLb;
 
+-(void)setHighlight:(BOOL)highlight;
+
 @end
 
 @implementation DWlogCell
 
+#pragma mark --- interface method ---
+/**
+ 是否展示高亮状态
+
+ @param highlight 高亮状态
+ */
+-(void)setHighlight:(BOOL)highlight {
+    if (highlight) {
+        self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.3];
+    } else {
+        self.contentView.backgroundColor = [UIColor clearColor];
+    }
+}
+
+#pragma mark --- tool method ---
 -(void)setupUI {
     [super setupUI];
     self.logLb = [[UILabel alloc] init];
@@ -171,6 +185,7 @@ static DWFloatPot * pot = nil;
     [self.contentView addConstraint:downConstraint];
 }
 
+#pragma mark --- override ---
 -(void)setModel:(DWLogModel *)model {
     [super setModel:model];
     self.logLb.attributedText = model.logString;
@@ -182,9 +197,10 @@ static DWFloatPot * pot = nil;
 
 @implementation DWLogViewController
 
+#pragma mark --- life ---
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.view addSubview:self.searchController.searchBar];
+    [self.view addSubview:self.searchView];
     [self.view addSubview:self.mainTab];
     if ([UIScrollView instancesRespondToSelector:NSSelectorFromString(@"setContentInsetAdjustmentBehavior:")]) {
 #pragma clang diagnostic push
@@ -196,28 +212,169 @@ static DWFloatPot * pot = nil;
     }
 }
 
-#pragma mark --- UISearchResultsUpdating ---
--(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
-    NSMutableArray * oriArr = self.filterLogArray ? : self.dataArr;
-    oriArr = [self filterSearchArray:oriArr];
-    self.helper.dataSource = oriArr;
-    [self.helper reloadDataWithCompletion:nil];
+#pragma mark --- tool method ---
+
+/**
+ 返回符合条件的结果数组
+
+ @param condition 搜索条件
+ @return 结果数组
+ */
+-(NSMutableArray *)searchIndexArrayFromCondition:(NSString *)condition {
+    if (!condition.length) {
+        return nil;
+    }
+    
+    ///直接对比当前展示数据源是否符合条件，若符合，记录idx
+    NSMutableArray * temp = @[].mutableCopy;
+    [self.helper.dataSource enumerateObjectsUsingBlock:^(DWLogModel * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.absoluteLog.uppercaseString containsString:condition.uppercaseString]) {
+            [temp addObject:@(idx)];
+        }
+    }];
+    if (!temp.count) {
+        return nil;
+    }
+    return temp;
 }
 
--(NSMutableArray *)filterSearchArray:(NSMutableArray *)array {
-    NSString * conditionString = self.searchController.searchBar.text;
-    if (!conditionString.length) {
-        return array;
+/**
+ 按条件搜索日志
+
+ @param condition 搜索条件
+ */
+-(void)searchCondition:(NSString *)condition {
+    
+    NSMutableArray * result = [self searchIndexArrayFromCondition:condition];
+    self.searchIndexArray = result;
+    
+    if (!result) {///如果没有搜索结果时应清楚之前的搜索结果
+        [self clearSearchResult];
+    } else {///否则高亮搜索结果的第一项
+        [self changeSearchIndex:0];
     }
-    return [[array dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
-        return [obj.absoluteLog.uppercaseString containsString:conditionString.uppercaseString];
-    }] mutableCopy];
+}
+
+/**
+ 改变当前高亮搜索项
+
+ @param index 当前搜索控件处于的结果角标数
+ */
+-(void)changeSearchIndex:(NSUInteger)index {
+    ///改变当前高亮状态
+    /*
+     需要考虑高亮状态的改变
+     1.在searchIndexArray数组中寻找对应角标位置的列表idxP
+     2.取消之前的高亮状态
+     3.高亮当前应展示的搜索条目
+     4.将当前应展示条目滚动至屏幕中央
+     */
+    
+    if (index < self.searchIndexArray.count) {
+        NSUInteger idx = [self.searchIndexArray[index] unsignedIntegerValue];
+        if (idx < self.helper.dataSource.count) {
+            BOOL needChange = self.highlightIndex != idx;
+            if (needChange) {
+                
+                ///如果之前存在高亮状态，则取消高亮状态
+                if (self.highlightIndex >= 0 && self.highlightIndex < self.helper.dataSource.count) {
+                    DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.highlightIndex inSection:0]];
+                    [cell setHighlight:NO];
+                }
+                
+                ///高亮当前搜索项目
+                DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:[NSIndexPath indexPathForRow:idx inSection:0]];
+                [cell setHighlight:YES];
+                
+                ///滚动至当前位置
+                [self scrollToIndex:idx position:UITableViewScrollPositionMiddle animated:YES];
+                
+                ///记录当前位置
+                self.highlightIndex = idx;
+            }
+        }
+    }
+}
+
+///清楚搜索结果
+-(void)clearSearchResult {
+    
+    /*
+     清楚搜索结果，及相关标志状态
+     1.取消高亮状态
+     2.重置搜索控件
+     3.重置当前搜索位置
+     4.重置结果角标数组
+     */
+    if (self.highlightIndex < self.helper.dataSource.count) {
+        DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.highlightIndex inSection:0]];
+        [cell setHighlight:NO];
+    }
+    [self.searchView reset];
+    self.highlightIndex = -1;
+    self.searchIndexArray = nil;
+}
+
+///刷新列表
+-(void)reloadMainTab {
+    ///刷新列表操作
+    /*
+     刷新列表时应该考虑是否为搜索状态，不同状态下有不同的交互模式
+     1.非搜索模式或无搜索结果
+     此状态下无高亮显示的当前结果，故此时刷新列表后直接滚动至列表末尾即可
+     2.为搜索模式且搜索结果仅有一个
+     此时说明从无高亮状态进入有高亮状态，且高亮状态为列表末尾，故刷新列表后滚动至列表末尾并高亮
+     3.为搜索模式且当前存在高亮状态
+     此状态说明更新的条目为查找项，但当前展示即为更新前的高亮项目，此时刷新列表后不做列表滚动，保持当前高亮状态的查看
+     */
+    
+    NSMutableArray * result = nil;
+    ///搜索状态
+    if (self.searchView.text.length) {
+        ///获取符合条件数组
+        result = [self searchIndexArrayFromCondition:self.searchView.text];
+        self.searchIndexArray = result;
+        
+        ///更新搜索控件结果数
+        [self.searchView updateResultCount:result.count];
+    }
+    
+    ///根据搜索结果数区分三种状态
+    if (result.count == 0) {///非搜索模式或无搜索结果
+        NSInteger count = self.helper.dataSource.count;
+        [self.helper reloadDataWithCompletion:^{
+            if (count == 0) {
+                return;
+            }
+            [self scrollToIndex:count - 1 position:UITableViewScrollPositionBottom animated:NO];
+        }];
+    } else if (result.count == 1) {///为搜索模式且搜索结果仅有一个
+        [self.helper reloadDataWithCompletion:^{
+            [self changeSearchIndex:0];
+        }];
+    } else {///为搜索模式且当前存在高亮状态
+        [self.helper reloadDataWithCompletion:nil];
+    }
+}
+
+///滚动至指定角标
+-(void)scrollToIndex:(NSUInteger)idx position:(UITableViewScrollPosition)position animated:(BOOL)animated {
+    NSIndexPath * indexP = [NSIndexPath indexPathForRow:idx inSection:0];
+    [self.mainTab scrollToRowAtIndexPath:indexP atScrollPosition:(position) animated:animated];
+}
+
+#pragma mark --- override ---
+-(instancetype)init {
+    if (self = [super init]) {
+        self.highlightIndex = -1;
+    }
+    return self;
 }
 
 #pragma mark --- setter/getter ---
 -(UITableView *)mainTab {
     if (!_mainTab) {
-        _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, self.searchController.searchBar.bounds.size.height, self.view.bounds.size.width, self.view.bounds.size.height - self.searchController.searchBar.bounds.size.height) style:(UITableViewStylePlain)];
+        _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, self.searchView.bounds.size.height, self.view.bounds.size.width, self.view.bounds.size.height - self.searchView.bounds.size.height) style:UITableViewStylePlain];
         self.helper = [[DWTableViewHelper alloc] initWithTabV:_mainTab dataSource:self.dataArr];
         self.helper.useAutoRowHeight = YES;
         _mainTab.backgroundColor = [UIColor clearColor];
@@ -236,17 +393,19 @@ static DWFloatPot * pot = nil;
     return _dataArr;
 }
 
--(UISearchController *)searchController {
-    if (!_searchController) {
-        _searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
-        _searchController.searchResultsUpdater = self;
-        _searchController.hidesNavigationBarDuringPresentation = NO;
-        _searchController.dimsBackgroundDuringPresentation = NO;
-        if (@available(iOS 9.1,*)) {
-            _searchController.obscuresBackgroundDuringPresentation = NO;
-        }
+-(DWSearchView *)searchView {
+    if (!_searchView) {
+        _searchView = [[DWSearchView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 0)];
+        __weak typeof(self)weakSelf = self;
+        _searchView.searchCallback = ^NSInteger(NSString *text) {
+            [weakSelf searchCondition:text];
+            return weakSelf.searchIndexArray.count;
+        };
+        _searchView.stepperCallback = ^(NSInteger value) {
+            [weakSelf changeSearchIndex:value];
+        };
     }
-    return _searchController;
+    return _searchView;
 }
 
 @end
@@ -257,23 +416,6 @@ static DWLogView * loggerView = nil;
 @implementation DWLogView
 
 #pragma mark --- interface method ---
-+(instancetype)shareLogView {
-#ifndef DevEvn
-    return nil;
-#else
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        loggerView = [[DWLogView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        loggerView.windowLevel = UIWindowLevelAlert + 1;
-        loggerView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
-        loggerView.hidden = NO;
-        loggerView.alpha = 0;
-        loggerView.userInteractionEnabled = NO;
-        loggerView.rootViewController = [DWLogViewController new];
-    });
-    return loggerView;
-#endif
-}
 
 +(void)enableUserInteraction {
     [DWLogView shareLogView].userInteractionEnabled = YES;
@@ -317,63 +459,51 @@ static DWLogView * loggerView = nil;
 }
 
 +(void)updateLog:(DWLogModel *)logModel filter:(DWLoggerFilter)filter {
+    ///更新日志操作
+    /*
+     更新日志需要考虑两个点，一种是过滤模式，一种是搜索模式。
+     过滤模式改变时应该改变数据源，同时应清除搜索条件。
+     搜索模式下更新时应注意高亮显示的刷新交互。
+     */
+    
     DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
-    if (vc.filterLogArrayNeedChange) {///保证filterLogArray完整，后再以搜索条件过滤搜索数组，再刷新
+    
+    ///过滤模式改变则数据源应发生相应变化，此时应清除搜索条件并刷新列表（由于此时数据源发生变化故无需考虑数据源中增添元素的问题）
+    if (vc.filterLogArrayNeedChange) {
+        [vc clearSearchResult];
         if (filter == DWLoggerIgnore) {
             NSMutableArray * tempArr = [self filterAllArr:vc.dataArr];
             vc.filterLogArray = tempArr;
-            tempArr = [vc filterSearchArray:tempArr];
             vc.helper.dataSource = tempArr;
         } else if (filter == DWLoggerAll) {
-            vc.helper.dataSource = [vc filterSearchArray:vc.dataArr];
+            vc.helper.dataSource = vc.dataArr;
             vc.filterLogArray = nil;
         } else {
             NSMutableArray * tempArr = [self filterDataArr:vc.dataArr filter:filter];
             vc.filterLogArray = tempArr;
-            tempArr = [vc filterSearchArray:tempArr];
             vc.helper.dataSource = tempArr;
         }
         NSUInteger count = vc.helper.dataSource.count;
-        UITableView * tab = vc.mainTab;
         [vc.helper reloadDataWithCompletion:^{
             if (count == 0) {
                 return;
             }
-            NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
-            [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
+            [vc scrollToIndex:count - 1 position:UITableViewScrollPositionBottom animated:NO];
         }];
         vc.filterLogArrayNeedChange = NO;
         return;
     }
     
-    NSUInteger count = 0;
-    UITableView * tab = vc.mainTab;
+    
+    ///非全部展示时以filterLogArray为数据源，此时符合条件才添加元素至数据源
     if (vc.filterLogArray) {
         if (logModel && filter & [DWLogManager shareLogManager].logFilter) {
             [vc.filterLogArray addObject:logModel];
-            NSMutableArray * temp = [vc filterSearchArray:vc.filterLogArray];
-            vc.helper.dataSource = temp;
-            count = temp.count;
-            [vc.helper reloadDataWithCompletion:^{
-                if (count == 0) {
-                    return;
-                }
-                NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
-                [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
-            }];
         }
-        return;
     }
-    NSMutableArray * temp = [vc filterSearchArray:vc.dataArr];
-    count = temp.count;
-    vc.helper.dataSource = temp;
-    [vc.helper reloadDataWithCompletion:^{
-        if (count == 0) {
-            return;
-        }
-        NSIndexPath * indexP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
-        [tab scrollToRowAtIndexPath:indexP atScrollPosition:(UITableViewScrollPositionBottom) animated:NO];
-    }];
+    
+    ///刷新列表并按需滚动
+    [vc reloadMainTab];
 }
 
 +(NSMutableArray *)filterDataArr:(NSArray <DWLogModel *>*)dataArr filter:(DWLoggerFilter)filter {
@@ -389,6 +519,24 @@ static DWLogView * loggerView = nil;
 }
 
 #pragma mark --- singleton ---
++(instancetype)shareLogView {
+#ifndef DevEvn
+    return nil;
+#else
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        loggerView = [[DWLogView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        loggerView.windowLevel = UIWindowLevelAlert + 1;
+        loggerView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
+        loggerView.hidden = NO;
+        loggerView.alpha = 0;
+        loggerView.userInteractionEnabled = NO;
+        loggerView.rootViewController = [DWLogViewController new];
+    });
+    return loggerView;
+#endif
+}
+
 +(instancetype)allocWithZone:(struct _NSZone *)zone {
 #ifndef DevEvn
     return nil;
@@ -407,6 +555,32 @@ static DWLogView * loggerView = nil;
 
 -(instancetype)mutableCopyWithZone:(struct _NSZone *)zone {
     return self;
+}
+
+#pragma mark --- override ---
+-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView * view = [super hitTest:point withEvent:event];
+    DWLogViewController * logVC = (DWLogViewController *)self.rootViewController;
+    if (view) {///当点击搜索框的textField之外时，应注意去除响应者并如果此时如果为非搜索状态应清楚搜索结果
+        if ([view isEqual:self]) {///若果是window本身则无可响应者，即点击在窗口上，应释放第一响应者。
+            [logVC.searchView endEditing:YES];
+            if (!logVC.searchView.text.length && logVC.searchIndexArray.count) {
+                [logVC clearSearchResult];
+            }
+        } else {///否则找到当前响应视图的是否在tableView上，如果在则释放搜索栏的响应者
+            UIView * temp = view;
+            while (temp.superview && temp.superview != logVC.view) {
+                temp = temp.superview;
+            }
+            if ([temp isEqual:logVC.mainTab]) {
+                [logVC.searchView endEditing:YES];
+                if (!logVC.searchView.text.length && logVC.searchIndexArray.count) {
+                    [logVC clearSearchResult];
+                }
+            }
+        }
+    }
+    return view;
 }
 
 #pragma mark --- setter/getter ---
@@ -532,8 +706,16 @@ static DWLogView * loggerView = nil;
 
 -(void)clearBtnAction:(UIButton *)sender
 {
+    ///清楚日志并清除相关标志位
+    /*
+     1.清除屏幕日志
+     2.清除搜索结果
+     3.清除过滤数据源
+     4.刷新列表
+     */
     [DWLogManager clearCurrentLog];
     DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+    [vc clearSearchResult];
     [vc.filterLogArray removeAllObjects];
     [vc.helper reloadDataWithCompletion:nil];
 }
@@ -684,7 +866,8 @@ static DWLogView * loggerView = nil;
     DWLogManager * logger = [DWLogManager shareLogManager];
     if (filter != logger.logFilter) {
         logger.logFilter = filter;
-        ((DWLogViewController *)[DWLogView shareLogView].rootViewController).filterLogArrayNeedChange = YES;
+        DWLogViewController * logVC = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+        logVC.filterLogArrayNeedChange = YES;
         [DWLogView updateLog:nil filter:filter];
     }
 }

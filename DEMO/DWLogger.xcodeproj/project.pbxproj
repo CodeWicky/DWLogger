@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		21DAB22B20332CD400310A0C /* DWSearchView.m in Sources */ = {isa = PBXBuildFile; fileRef = 21DAB22A20332CD400310A0C /* DWSearchView.m */; };
 		21FD4AE41FC52947001DC362 /* NSArray+DWArrayUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FD4AE21FC52946001DC362 /* NSArray+DWArrayUtils.m */; };
 		21FD4AE71FC52952001DC362 /* UIDevice+DWDeviceUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FD4AE61FC52952001DC362 /* UIDevice+DWDeviceUtils.m */; };
 		21FD4AEA1FC5295E001DC362 /* DWFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 21FD4AE91FC5295E001DC362 /* DWFileManager.m */; };
@@ -43,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		21DAB22920332CD400310A0C /* DWSearchView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWSearchView.h; sourceTree = "<group>"; };
+		21DAB22A20332CD400310A0C /* DWSearchView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWSearchView.m; sourceTree = "<group>"; };
 		21FD4AE21FC52946001DC362 /* NSArray+DWArrayUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSArray+DWArrayUtils.m"; path = "Dependence/DWArrayUtils/NSArray+DWArrayUtils.m"; sourceTree = "<group>"; };
 		21FD4AE31FC52947001DC362 /* NSArray+DWArrayUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSArray+DWArrayUtils.h"; path = "Dependence/DWArrayUtils/NSArray+DWArrayUtils.h"; sourceTree = "<group>"; };
 		21FD4AE51FC52952001DC362 /* UIDevice+DWDeviceUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIDevice+DWDeviceUtils.h"; path = "Dependence/DWDeviceUtils/UIDevice+DWDeviceUtils.h"; sourceTree = "<group>"; };
@@ -107,6 +110,8 @@
 		9B1592D71F83D3F2003ECA7E /* DWLogger */ = {
 			isa = PBXGroup;
 			children = (
+				21DAB22920332CD400310A0C /* DWSearchView.h */,
+				21DAB22A20332CD400310A0C /* DWSearchView.m */,
 				21FD4AE81FC5295E001DC362 /* DWFileManager.h */,
 				21FD4AE91FC5295E001DC362 /* DWFileManager.m */,
 				21FD4AE51FC52952001DC362 /* UIDevice+DWDeviceUtils.h */,
@@ -397,6 +402,7 @@
 				9B2FA0D21F7A276100AAC6CF /* ViewController.m in Sources */,
 				9B2FA0DD1F7A276100AAC6CF /* main.m in Sources */,
 				21FD4AEA1FC5295E001DC362 /* DWFileManager.m in Sources */,
+				21DAB22B20332CD400310A0C /* DWSearchView.m in Sources */,
 				21FD4AE41FC52947001DC362 /* NSArray+DWArrayUtils.m in Sources */,
 				9B2FA0CF1F7A276100AAC6CF /* AppDelegate.m in Sources */,
 				9B1592FE1F83D3F3003ECA7E /* DWLogManager.m in Sources */,

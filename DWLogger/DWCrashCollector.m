@@ -230,7 +230,7 @@ static inline NSString * crashConfigPath() {
     return [sP stringByAppendingPathComponent:@"Crash/CrashConfig.plist"];
 }
 
-#pragma mark --- over write ---
+#pragma mark --- override ---
 -(instancetype)init {
     return nil;
 }

@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "DWLogger.h"
+#import "DWSearchView.h"
 
 @interface ViewController ()
 
@@ -18,23 +19,66 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor yellowColor];
     
     UIView * red = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
     [self.view addSubview:red];
     red.backgroundColor = [UIColor redColor];
     
-    DWLog(@"全局");
-    DWLogNormal(@"普通");
-    DWLogInfo(@"信息");
-    DWLogWarning(@"警告");
-    DWLogError(@"错误");
-    NSLog(@"系统");
+//    DWSearchView * v = [[DWSearchView alloc] init];
+//    [self.view addSubview:v];
+    
+//    DWLog(@"全局");
+//    DWLogNormal(@"normal");
+//    DWLogInfo(@"信息");
+//    DWLogWarning(@"警告");
+//    DWLogError(@"错误");
+//    NSLog(@"系统");
+//    
+//    DWLog(@"全局");
+//    DWLogNormal(@"normal");
+//    DWLogInfo(@"信息");
+//    DWLogWarning(@"警告");
+//    DWLogError(@"错误");
+//    NSLog(@"系统");
+//    
+//    DWLog(@"全局");
+//    DWLogNormal(@"normal");
+//    DWLogInfo(@"信息");
+//    DWLogWarning(@"警告");
+//    DWLogError(@"错误");
+//    NSLog(@"系统");
+//    
+//    DWLog(@"全局");
+//    DWLogNormal(@"normal");
+//    DWLogInfo(@"信息");
+//    DWLogWarning(@"警告");
+//    DWLogError(@"错误");
+//    NSLog(@"系统");
+//    
+//    DWLog(@"全局");
+//    DWLogNormal(@"normal");
+//    DWLogInfo(@"信息");
+//    DWLogWarning(@"警告");
+//    DWLogError(@"错误");
+//    NSLog(@"系统");
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
 //    abort();//此句可导致信号崩溃
-    [@[] objectAtIndex:1];//此句可导致异常崩溃
+//    [@[] objectAtIndex:1];//此句可导致异常崩溃
+    
+//    DWLog(@"111");
+    
+    DWLogNormal(@"as");
+    
+//    DWLog(@"全局");
+//    DWLogNormal(@"normal");
+//    DWLogInfo(@"信息");
+//    DWLogWarning(@"警告");
+//    DWLogError(@"错误");
+//    NSLog(@"系统");
+    
 }
 
 - (void)didReceiveMemoryWarning {
