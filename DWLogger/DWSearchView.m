@@ -181,7 +181,6 @@
 }
 
 -(void)commitBtnAction:(UIButton *)sender {
-    [self endEditing:YES];
     if (self.searchCallback && self.txtF.text.length) {
         NSInteger resultCount = self.searchCallback(self.txtF.text);
         self.value = 0;
