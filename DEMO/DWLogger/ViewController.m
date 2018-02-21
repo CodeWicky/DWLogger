@@ -69,8 +69,9 @@
 //    [@[] objectAtIndex:1];//此句可导致异常崩溃
     
 //    DWLog(@"111");
-    
-    DWLogNormal(@"as");
+    static int i = 0;
+    i++;
+    DWLogNormal(@"as%d",i);
     
 //    DWLog(@"全局");
 //    DWLogNormal(@"normal");

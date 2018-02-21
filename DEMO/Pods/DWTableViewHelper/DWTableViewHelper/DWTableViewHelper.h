@@ -82,6 +82,15 @@
  helper添加自动适配TableView内距API
  适配iOS11后tableView的sectionHeader与footer代理高度问题
  
+ version 1.1.6
+ 修改自动计算高度API中忽略cell辅助视图宽度的bug
+ 修复自动代理中heightForHeader代理映射错误bug
+ 添加iOS 11后refreshControl自动修复API
+ 更新事务类相关API
+ 
+ version 1.1.7
+ 添加头视图自动放大
+ cell添加计算行高标志位
  */
 
 #import <UIKit/UIKit.h>
@@ -315,8 +324,13 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
  高速滚动忽略模式
  当tableView快速滚动时，则认为当中快速略过的cell不需加载，以占位图进行展示
  
+ DWTableViewHelperLoadDataIgnoreHighSpeedWithSnapMode
+ 高速滚动加载截图模式
+ 当tableView快速滚动时，则认为当中快速略过的cell不需展示真实数据，以缓存的对应cell截图进行显示，若为缓存过截图则以占位图展示。（截图会在tableView停止滚动后提交截图任务，截图任务会在runLoop进入空闲状态时自动执行）
+ 
  注：
- 使用DWTableViewHelperLoadDataIgnoreHighSpeedMode模式时，若cell需要自行实现-(UIView *)hitTest:withEvent:方法，为了更好的滑动体验，请调用父类实现
+ 1.高速忽略模式下，由于需要计算结束滚动处所要展示的cell，故适用于定行高时，若在自动计算行高模式下会有偏差，且偏差具有累积效应。
+ 2.使用DWTableViewHelperLoadDataIgnoreHighSpeedMode模式时，若cell需要自行实现-(UIView *)hitTest:withEvent:方法，为了更好的滑动体验，请调用父类实现。
  */
 @property (nonatomic ,assign) DWTableViewHelperLoadDataMode loadDataMode;
 
@@ -336,7 +350,7 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
 -(instancetype)initWithTabV:(__kindof UITableView *)tabV dataSource:(NSArray *)dataSource;
 
 ///取出对应indexPath对应的数据模型（具有容错机制）
--(DWTableViewHelperModel *)modelFromIndexPath:(NSIndexPath *)indexPath;
+-(__kindof DWTableViewHelperModel *)modelFromIndexPath:(NSIndexPath *)indexPath;
 
 ///让分割线归零
 -(void)setTheSeperatorToZero;
@@ -345,7 +359,7 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
 -(void)reloadDataAndHandlePlaceHolderView;
 
 ///刷新列表并在完成时进行回调
--(void)reloadDataWithCompletion:(void(^)())completion;
+-(void)reloadDataWithCompletion:(dispatch_block_t)completion;
 
 ///展示占位图
 -(void)showPlaceHolderView;
@@ -380,6 +394,18 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
 
 ///激活tableView的自动调整状态（适配iOS11）
 -(void)enableTableViewContentInsetAutoAdjust:(BOOL)autoAdjust inViewController:(UIViewController *)vc;
+
+///修复iOS11后refreshControl位置错误
+-(void)fixRefreshControlInsets;
+
+
+/**
+ 设置自动放大的头视图，与tableHeaderView相互冲突
+
+ @param header 设置的headerView
+ @param handler 当滚动时的触发回调，可在此处处理导航透明度
+ */
+-(void)setAutoZoomHeader:(UIView *)header scrollHandler:(void(^)(CGFloat contentoffset))handler;
 @end
 
 #pragma mark --- DWTableViewHelperModel 数据模型基类 ---
@@ -416,6 +442,9 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
 extern NSNotificationName const DWTableViewHelperCellHitTestNotification;
 
 @interface DWTableViewHelperCell : UITableViewCell
+
+///计算用cell，只有仅用于自动计算行高的cell会将此标志位置为真
+@property (nonatomic ,assign ,readonly) BOOL just4Cal;
 
 ///数据模型
 @property (nonatomic ,strong)__kindof DWTableViewHelperModel * model;

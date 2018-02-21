@@ -98,6 +98,16 @@ static UIImage * ImageNull = nil;
 ///进程打断工具类
 @property (nonatomic ,strong) DWOperationCancelFlag * flag;
 
+///自动缩放头视图回调
+@property (nonatomic ,copy) void(^autoZoomHeaderHandler)(CGFloat contentoffset);
+
+//自动缩放头视图模式
+@property (nonatomic ,assign) BOOL autoZoomHeaderMode;
+
+@property (nonatomic ,strong) UIView * autoZoomHeader;
+
+@property (nonatomic ,assign) CGRect autoZoomOriFrm;
+
 @end
 
 @interface DWTableViewHelperModel ()
@@ -132,11 +142,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     return self;
 }
 
--(void)setTheSeperatorToZero {
-    [self.tabV setSeparatorInset:UIEdgeInsetsZero];
-}
-
--(DWTableViewHelperModel *)modelFromIndexPath:(NSIndexPath *)indexPath {
+-(__kindof DWTableViewHelperModel *)modelFromIndexPath:(NSIndexPath *)indexPath {
     id obj = nil;
     if (self.multiSection) {
         obj = self.dataSource[indexPath.section];
@@ -168,7 +174,20 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     return obj;
 }
 
--(void)reloadDataWithCompletion:(void (^)())completion
+-(void)setTheSeperatorToZero {
+    [self.tabV setSeparatorInset:UIEdgeInsetsZero];
+}
+
+-(void)reloadDataAndHandlePlaceHolderView
+{
+    BOOL haveData = [self caculateHaveData];
+    __weak typeof(self)weakSelf = self;
+    [self reloadDataWithCompletion:^{
+        handlePlaceHolderView(weakSelf.placeHolderView, weakSelf.tabV, !haveData, &hasPlaceHolderView);
+    }];
+}
+
+-(void)reloadDataWithCompletion:(dispatch_block_t)completion
 {
     if (!completion) {
         [self.tabV reloadData];
@@ -182,27 +201,15 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     });
 }
 
--(void)reloadDataAndHandlePlaceHolderView
-{
-    BOOL haveData = [self caculateHaveData];
-    __weak typeof(self)weakSelf = self;
-    [self reloadDataWithCompletion:^{
-        handlePlaceHolderView(weakSelf.placeHolderView, weakSelf.tabV, !haveData, &hasPlaceHolderView);
-    }];
-}
-
--(void)showPlaceHolderView
-{
+-(void)showPlaceHolderView {
     handlePlaceHolderView(self.placeHolderView, self.tabV, YES, &hasPlaceHolderView);
 }
 
--(void)hidePlaceHolderView
-{
+-(void)hidePlaceHolderView {
     handlePlaceHolderView(self.placeHolderView, self.tabV, NO, &hasPlaceHolderView);
 }
 
--(void)setAllSelect:(BOOL)select
-{
+-(void)setAllSelect:(BOOL)select {
     NSUInteger count = self.tabV.numberOfSections;
     if (select) {
         for (int i = 0; i < count; i++) {
@@ -215,8 +222,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     }
 }
 
--(void)setSection:(NSUInteger)section allSelect:(BOOL)select
-{
+-(void)setSection:(NSUInteger)section allSelect:(BOOL)select {
     NSUInteger count = self.tabV.numberOfSections;
     if (section >= count) {
         return;
@@ -263,25 +269,6 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     return arr;
 }
 
--(void)invertSelectAll
-{
-    NSUInteger count = self.tabV.numberOfSections;
-    for (int i = 0; i < count; i++) {
-        [self invertSelectSection:i];
-    }
-}
-
--(void)enableTableViewContentInsetAutoAdjust:(BOOL)autoAdjust inViewController:(UIViewController *)vc {
-    if ([UIScrollView instancesRespondToSelector:NSSelectorFromString(@"setContentInsetAdjustmentBehavior:")]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        [_tabV   performSelector:NSSelectorFromString(@"setContentInsetAdjustmentBehavior:") withObject:autoAdjust?@0:@2];
-#pragma clang diagnostic pop
-    } else {
-        vc.automaticallyAdjustsScrollViewInsets = autoAdjust;
-    }
-}
-
 -(void)invertSelectSection:(NSUInteger)section
 {
     NSUInteger count = self.tabV.numberOfSections;
@@ -314,6 +301,86 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
         {
             [self.tabV selectRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:section] animated:NO scrollPosition:UITableViewScrollPositionNone];
         }
+    }
+}
+
+-(void)invertSelectAll
+{
+    NSUInteger count = self.tabV.numberOfSections;
+    for (int i = 0; i < count; i++) {
+        [self invertSelectSection:i];
+    }
+}
+
+-(void)enableTableViewContentInsetAutoAdjust:(BOOL)autoAdjust inViewController:(UIViewController *)vc {
+    if (@available(iOS 11.0,*)) {
+        _tabV.contentInsetAdjustmentBehavior = autoAdjust?UIScrollViewContentInsetAdjustmentAutomatic:UIScrollViewContentInsetAdjustmentNever;
+    } else {
+        vc.automaticallyAdjustsScrollViewInsets = autoAdjust;
+    }
+}
+
+-(void)fixRefreshControlInsets {
+    if (@available(iOS 11.0,*)) {
+        _tabV.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        _tabV.contentInset = UIEdgeInsetsMake(64, 0, 49, 0);
+        _tabV.scrollIndicatorInsets = _tabV.contentInset;
+    }
+}
+
+-(void)setAutoZoomHeader:(UIView *)header scrollHandler:(void (^)(CGFloat))handler {
+    
+    if (header == nil) {
+        [self removeAutoZoomHeader];
+        return;
+    }
+    
+    ///添加容器层，保证header在边缘处被剪切
+    UIView * container = [[UIView alloc] initWithFrame:_tabV.frame];
+    container.backgroundColor = _tabV.backgroundColor;
+    container.clipsToBounds = YES;
+    UIView * superView = _tabV.superview;
+    [superView insertSubview:container belowSubview:_tabV];
+    _tabV.frame = _tabV.bounds;
+    [container addSubview:_tabV];
+
+    ///添加占位视图
+    CGRect headerBounds = header.bounds;
+    headerBounds.size.width = _tabV.bounds.size.width;
+    UIView * placeHolder = [[UIView alloc] initWithFrame:headerBounds];
+    _tabV.tableHeaderView = placeHolder;
+    _tabV.backgroundColor = [UIColor clearColor];
+    
+    ///添加头视图
+    header.frame = header.bounds;
+    [container insertSubview:header belowSubview:_tabV];
+    
+    ///设置相关值
+    self.autoZoomHeader = header;
+    self.autoZoomHeaderHandler = handler;
+    self.autoZoomOriFrm = header.bounds;
+    self.autoZoomHeaderMode = YES;
+}
+
+-(void)removeAutoZoomHeader {
+    if (self.autoZoomHeaderMode) {
+        
+        ///放回原父视图
+        UIView * container = _tabV.superview;
+        UIView * superView = container.superview;
+        CGRect containerFrm = _tabV.superview.frame;
+        _tabV.frame = containerFrm;
+        [superView insertSubview:_tabV belowSubview:container];
+        
+        ///移除容器层及头视图
+        [container removeFromSuperview];
+        _tabV.tableHeaderView = nil;
+        
+        ///恢复默认值
+        self.autoZoomHeaderMode = NO;
+        self.autoZoomHeader = nil;
+        self.autoZoomHeaderHandler = nil;
+        self.autoZoomOriFrm = CGRectNull;
     }
 }
 
@@ -399,7 +466,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     if (DWRespond) {
         return [DWDelegate dw_TableView:tableView heightForFooterInSection:section];
     }
-    if (self.helperDelegate && [self.helperDelegate respondsToSelector:@selector(dw_TableView:heightForFooterInSection:)]) {
+    if (self.helperDelegate && [self.helperDelegate respondsToSelector:@selector(dw_TableView:viewForFooterInSection:)]) {
         return [self.helperDelegate dw_TableView:tableView viewForFooterInSection:section].bounds.size.height;
     }
     if (@available(iOS 11, *)) {
@@ -584,6 +651,8 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
 ///focus
 - (BOOL)tableView:(UITableView *)tableView canFocusRowAtIndexPath:(NSIndexPath *)indexPath {
     if (@available(iOS 9.0,*)) {
@@ -617,6 +686,8 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     }
     return nil;
 }
+#pragma clang diagnostic pop
+
 
 ///dataSource
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -721,6 +792,29 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
 ///scroll
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    ///自动缩放模式
+    if (self.autoZoomHeaderMode && self.autoZoomHeader) {
+        CGFloat offsetY = scrollView.contentOffset.y;
+        CGRect desFrm = self.autoZoomOriFrm;
+        if (offsetY >= 0) {
+            if (desFrm.size.height - offsetY >= 0) {
+                desFrm.origin.y = -offsetY;
+            } else {
+                desFrm.origin.y = -desFrm.size.height;
+            }
+        } else {
+            CGFloat height = desFrm.size.height - offsetY;
+            CGFloat width = desFrm.size.width * 1.0 / desFrm.size.height * height;
+            CGFloat originX = (desFrm.size.width - width) / 2.0;
+            desFrm.size.width = width;
+            desFrm.size.height = height;
+            desFrm.origin.x = originX;
+        }
+        self.autoZoomHeader.frame = desFrm;
+        if (self.autoZoomHeaderHandler) {
+            self.autoZoomHeaderHandler(offsetY);
+        }
+    }
     DWRespondTo(DWParas(scrollView,nil));
 }
 
@@ -894,10 +988,10 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     CGRect cellBounds = cell.bounds;
     cellBounds.size.width = width;
     cell.bounds = cellBounds;
-
+    CGFloat accessoryViewWidth;
     //根据辅助视图校正width
     if (cell.accessoryView) {
-        width -= cell.accessoryView.bounds.size.width + 16;
+        accessoryViewWidth = (cell.accessoryView.bounds.size.width + 16);
     }
     else
     {
@@ -908,8 +1002,9 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
             [UITableViewCellAccessoryCheckmark] = 40,
             [UITableViewCellAccessoryDetailButton] = 48
         };
-        width -= accessoryWidth[cell.accessoryType];
+        accessoryViewWidth = accessoryWidth[cell.accessoryType];
     }
+    width -= accessoryViewWidth;
     CGFloat height = 0;
     if (width > 0) {//如果不是非自适应模式则添加约束后计算约束后高度
         NSLayoutConstraint * widthConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:width];
@@ -928,7 +1023,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
             
             ///添加4个约束
             NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
-            NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+            NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeRight multiplier:1.0 constant:accessoryViewWidth];
             NSLayoutConstraint *topConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
             NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
             edgeConstraints = @[leftConstraint, rightConstraint, topConstraint, bottomConstraint];
@@ -993,6 +1088,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     if (model.loadCellFromNib) {
         cell = [[NSBundle mainBundle] loadNibNamed:aCellClassStr owner:nil options:nil].lastObject;
         if (cell && !useReuse) {
+            [cell setValue:@(YES) forKey:@"_just4Cal"];
             self.dic4CalCell[aCellClassStr] = cell;
         }
         return cell;
@@ -1000,6 +1096,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     
     cell = [[cellClass alloc] initWithStyle:(UITableViewCellStyleDefault) reuseIdentifier:cellIDTemp];
     if (cell && !useReuse) {
+        [cell setValue:@(YES) forKey:@"_just4Cal"];
         self.dic4CalCell[aCellClassStr] = cell;
     }
     return cell;

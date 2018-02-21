@@ -203,8 +203,10 @@ static DWFloatPot * pot = nil;
 -(void)setModel:(DWLogModel *)model {
     [super setModel:model];
     self.logLb.attributedText = model.logString;
-    if (model.highlightStatusChanged) {
-        [self setHighlight:model.highlighted];
+    if (!self.just4Cal) {
+        if (model.highlightStatusChanged) {
+            [self setHighlight:model.highlighted];
+        }
     }
 }
 

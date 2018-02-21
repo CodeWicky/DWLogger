@@ -10,12 +10,29 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../DWLogger/DWLogView.m"
-            timestampString = "540891238.950078"
+            timestampString = "540922115.256006"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "265"
-            endingLineNumber = "265"
+            startingLineNumber = "267"
+            endingLineNumber = "267"
             landmarkName = "-searchCondition:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            condition = "[model.absoluteLog isEqualToString:@&quot;as28&quot;]"
+            continueAfterRunningActions = "No"
+            filePath = "../DWLogger/DWLogView.m"
+            timestampString = "540922115.256568"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "205"
+            endingLineNumber = "205"
+            landmarkName = "-setModel:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
