@@ -129,6 +129,14 @@ static DWFloatPot * pot = nil;
 }
 @end
 
+@interface DWLogModel ()
+
+@property (nonatomic ,assign) BOOL highlighted;
+
+@property (nonatomic ,assign) BOOL highlightStatusChanged;
+
+@end
+
 @implementation DWLogModel
 
 -(instancetype)init {
@@ -167,6 +175,9 @@ static DWFloatPot * pot = nil;
     } else {
         self.contentView.backgroundColor = [UIColor clearColor];
     }
+    DWLogModel * m = self.model;
+    m.highlighted = highlight;
+    m.highlightStatusChanged = NO;
 }
 
 #pragma mark --- tool method ---
@@ -192,6 +203,9 @@ static DWFloatPot * pot = nil;
 -(void)setModel:(DWLogModel *)model {
     [super setModel:model];
     self.logLb.attributedText = model.logString;
+    if (model.highlightStatusChanged) {
+        [self setHighlight:model.highlighted];
+    }
 }
 
 @end
@@ -278,20 +292,18 @@ static DWFloatPot * pot = nil;
         if (idx < self.helper.dataSource.count) {
             BOOL needChange = self.highlightIndex != idx;
             if (needChange) {
-                
+                NSIndexPath * idxP = nil;
                 ///如果之前存在高亮状态，则取消高亮状态
                 if (self.highlightIndex >= 0 && self.highlightIndex < self.helper.dataSource.count) {
-                    DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.highlightIndex inSection:0]];
-                    [cell setHighlight:NO];
+                    idxP = [NSIndexPath indexPathForRow:self.highlightIndex inSection:0];
+                    [self changeCellHighlight:NO atIndexPath:idxP];
                 }
                 
+                idxP = [NSIndexPath indexPathForRow:idx inSection:0];
                 ///高亮当前搜索项目
-                DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:[NSIndexPath indexPathForRow:idx inSection:0]];
-                [cell setHighlight:YES];
-                
+                [self changeCellHighlight:YES atIndexPath:idxP];
                 ///滚动至当前位置
                 [self scrollToIndex:idx position:UITableViewScrollPositionMiddle animated:YES];
-                
                 ///记录当前位置
                 self.highlightIndex = idx;
             }
@@ -366,6 +378,27 @@ static DWFloatPot * pot = nil;
 -(void)scrollToIndex:(NSUInteger)idx position:(UITableViewScrollPosition)position animated:(BOOL)animated {
     NSIndexPath * indexP = [NSIndexPath indexPathForRow:idx inSection:0];
     [self.mainTab scrollToRowAtIndexPath:indexP atScrollPosition:(position) animated:animated];
+}
+
+///改变cell高亮状态
+-(void)changeCellHighlight:(BOOL)highlight atIndexPath:(NSIndexPath *)idxP {
+    
+    /*
+     考虑两种情况：
+     1.目标cell当前正在显示，则直接改变cell高亮状态即可。
+     2.目标cell不在显示区域，则改变model中标志位，再由展示时-setModel:触发高亮动画。
+     */
+    
+    DWLogModel * m = (DWLogModel *)[self.helper modelFromIndexPath:idxP];
+    DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:idxP];
+    if (cell) {
+        [cell setHighlight:highlight];
+    } else {
+        if (m.highlighted != highlight) {
+            m.highlightStatusChanged = YES;
+            m.highlighted = highlight;
+        }
+    }
 }
 
 #pragma mark --- override ---
