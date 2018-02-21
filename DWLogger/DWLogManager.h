@@ -78,6 +78,10 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
 ///A flag indicates whether auto backup log to disk.（Default NO）
 @property (nonatomic ,assign) BOOL autoBackUp;
 
+///日志显示最大长度。（默认为1024 * 5个字符）
+///The max length for log to show.（default by 1024 * 5）
+@property (nonatomic ,assign) NSInteger maxLogLength;
+
 ///展示的Log类型过滤器（默认为DWLoggerAll）
 ///Property control DWLogger Filter.DWLogger will only show the Logs among the filter.（Default DWLoggerAll）
 @property (nonatomic ,assign) DWLoggerFilter logFilter;

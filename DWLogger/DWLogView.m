@@ -133,8 +133,6 @@ static DWFloatPot * pot = nil;
 
 @property (nonatomic ,assign) BOOL highlighted;
 
-@property (nonatomic ,assign) BOOL highlightStatusChanged;
-
 @end
 
 @implementation DWLogModel
@@ -154,7 +152,7 @@ static DWFloatPot * pot = nil;
 
 @property (nonatomic ,strong) UILabel * logLb;
 
--(void)setHighlight:(BOOL)highlight;
+-(void)setBackgroundHighlight:(BOOL)highlight;
 
 @end
 
@@ -166,7 +164,7 @@ static DWFloatPot * pot = nil;
 
  @param highlight 高亮状态
  */
--(void)setHighlight:(BOOL)highlight {
+-(void)setBackgroundHighlight:(BOOL)highlight {
     if (highlight) {
         self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.7];
         [UIView animateWithDuration:0.4 animations:^{
@@ -175,10 +173,8 @@ static DWFloatPot * pot = nil;
     } else {
         self.contentView.backgroundColor = [UIColor clearColor];
     }
-    DWLogModel * m = self.model;
-    m.highlighted = highlight;
-    m.highlightStatusChanged = NO;
 }
+
 
 #pragma mark --- tool method ---
 -(void)setupUI {
@@ -204,10 +200,15 @@ static DWFloatPot * pot = nil;
     [super setModel:model];
     self.logLb.attributedText = model.logString;
     if (!self.just4Cal) {
-        if (model.highlightStatusChanged) {
-            [self setHighlight:model.highlighted];
+        if (model.highlighted) {
+            [self setBackgroundHighlight:model.highlighted];
         }
     }
+}
+
+-(void)prepareForReuse {
+    [super prepareForReuse];
+    [self setBackgroundHighlight:NO];
 }
 
 @end
@@ -305,7 +306,7 @@ static DWFloatPot * pot = nil;
                 ///高亮当前搜索项目
                 [self changeCellHighlight:YES atIndexPath:idxP];
                 ///滚动至当前位置
-                [self scrollToIndex:idx position:UITableViewScrollPositionMiddle animated:YES];
+                [self.mainTab scrollToRowAtIndexPath:idxP atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
                 ///记录当前位置
                 self.highlightIndex = idx;
             }
@@ -325,7 +326,9 @@ static DWFloatPot * pot = nil;
      */
     if (self.highlightIndex < self.helper.dataSource.count) {
         DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.highlightIndex inSection:0]];
-        [cell setHighlight:NO];
+        DWLogModel * m = cell.model;
+        m.highlighted = NO;
+        [cell setBackgroundHighlight:NO];
     }
     self.highlightIndex = -1;
     self.searchIndexArray = nil;
@@ -334,17 +337,17 @@ static DWFloatPot * pot = nil;
     }
 }
 
-///刷新列表
--(void)reloadMainTab {
-    ///刷新列表操作
+///插入列表
+-(void)insertMainTab {
+    ///插入列表末尾项
     /*
-     刷新列表时应该考虑是否为搜索状态，不同状态下有不同的交互模式
+     插入列表时应该考虑是否为搜索状态，不同状态下有不同的交互模式
      1.非搜索模式或无搜索结果
-     此状态下无高亮显示的当前结果，故此时刷新列表后直接滚动至列表末尾即可
+     此状态下无高亮显示的当前结果，故此时插入列表后直接滚动至列表末尾即可
      2.为搜索模式且搜索结果仅有一个
-     此时说明从无高亮状态进入有高亮状态，且高亮状态为列表末尾，故刷新列表后滚动至列表末尾并高亮
+     此时说明从无高亮状态进入有高亮状态，且高亮状态为列表末尾，故插入列表后滚动至列表末尾并高亮
      3.为搜索模式且当前存在高亮状态
-     此状态说明更新的条目为查找项，但当前展示即为更新前的高亮项目，此时刷新列表后不做列表滚动，保持当前高亮状态的查看
+     此状态说明更新的条目为查找项，但当前展示即为更新前的高亮项目，此时插入列表后不做列表滚动，保持当前高亮状态的查看
      */
     
     NSMutableArray * result = nil;
@@ -359,27 +362,16 @@ static DWFloatPot * pot = nil;
     }
     
     ///根据搜索结果数区分三种状态
+    NSInteger count = self.helper.dataSource.count;
+    NSIndexPath * idxP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
+    [self.mainTab insertRowsAtIndexPaths:@[idxP] withRowAnimation:(UITableViewRowAnimationNone)];
     if (result.count == 0) {///非搜索模式或无搜索结果
-        NSInteger count = self.helper.dataSource.count;
-        [self.helper reloadDataWithCompletion:^{
-            if (count == 0) {
-                return;
-            }
-            [self scrollToIndex:count - 1 position:UITableViewScrollPositionBottom animated:NO];
-        }];
+        [self.mainTab scrollToRowAtIndexPath:idxP atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     } else if (result.count == 1) {///为搜索模式且搜索结果仅有一个
-        [self.helper reloadDataWithCompletion:^{
-            [self changeSearchIndex:0];
-        }];
+        [self changeSearchIndex:0];
     } else {///为搜索模式且当前存在高亮状态
-        [self.helper reloadDataWithCompletion:nil];
+        ///Do nothing.
     }
-}
-
-///滚动至指定角标
--(void)scrollToIndex:(NSUInteger)idx position:(UITableViewScrollPosition)position animated:(BOOL)animated {
-    NSIndexPath * indexP = [NSIndexPath indexPathForRow:idx inSection:0];
-    [self.mainTab scrollToRowAtIndexPath:indexP atScrollPosition:(position) animated:animated];
 }
 
 ///改变cell高亮状态
@@ -392,14 +384,10 @@ static DWFloatPot * pot = nil;
      */
     
     DWLogModel * m = (DWLogModel *)[self.helper modelFromIndexPath:idxP];
+    m.highlighted = highlight;
     DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:idxP];
     if (cell) {
-        [cell setHighlight:highlight];
-    } else {
-        if (m.highlighted != highlight) {
-            m.highlightStatusChanged = YES;
-            m.highlighted = highlight;
-        }
+        [cell setBackgroundHighlight:highlight];
     }
 }
 
@@ -417,6 +405,7 @@ static DWFloatPot * pot = nil;
         _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, self.searchView.bounds.size.height, self.view.bounds.size.width, self.view.bounds.size.height - self.searchView.bounds.size.height) style:UITableViewStylePlain];
         self.helper = [[DWTableViewHelper alloc] initWithTabV:_mainTab dataSource:self.dataArr];
         self.helper.useAutoRowHeight = YES;
+        _mainTab.estimatedRowHeight = 0;
         _mainTab.backgroundColor = [UIColor clearColor];
         _mainTab.showsVerticalScrollIndicator = NO;
         _mainTab.showsHorizontalScrollIndicator = NO;
@@ -528,7 +517,7 @@ static DWLogView * loggerView = nil;
             if (count == 0) {
                 return;
             }
-            [vc scrollToIndex:count - 1 position:UITableViewScrollPositionBottom animated:NO];
+            [vc.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
         }];
         vc.filterLogArrayNeedChange = NO;
         return;
@@ -542,8 +531,8 @@ static DWLogView * loggerView = nil;
         }
     }
     
-    ///刷新列表并按需滚动
-    [vc reloadMainTab];
+    ///数据源不发生变化，插入列表并按需滚动
+    [vc insertMainTab];
 }
 
 +(NSMutableArray *)filterDataArr:(NSArray <DWLogModel *>*)dataArr filter:(DWLoggerFilter)filter {

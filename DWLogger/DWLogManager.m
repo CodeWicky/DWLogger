@@ -41,6 +41,7 @@ static DWLogManager * mgr = nil;
     dispatch_once(&onceToken, ^{
         mgr = [[DWLogManager alloc] init];
         mgr.logFilter = DWLoggerAll;
+        mgr.maxLogLength = MaxLogLength;
         NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
         [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSSSSS"];
         [mgr configFormatter:formatter];
@@ -54,9 +55,10 @@ static DWLogManager * mgr = nil;
     if (logger.logView) {
         DWLogModel * model = [DWLogModel new];
         NSString * logTemp = [log copy];
-        if (logTemp.length > MaxLogLength) {
-            logTemp = [logTemp substringToIndex:MaxLogLength];
-            NSString * ignoreString = [NSString stringWithFormat:@"The log is too long whose length is more than %d,DWLogger has abstracted it.The abstract is :\n",MaxLogLength];
+        NSInteger maxL = logger.maxLogLength;
+        if (logTemp.length > maxL) {
+            logTemp = [logTemp substringToIndex:maxL];
+            NSString * ignoreString = [NSString stringWithFormat:@"The log is too long whose length is more than %ld,DWLogger has abstracted it.The abstract is :\n",(long)maxL];
             logTemp = [NSString stringWithFormat:@"%@%@...",ignoreString,logTemp];
         }
         NSMutableAttributedString * aStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@",prefix,logTemp]];

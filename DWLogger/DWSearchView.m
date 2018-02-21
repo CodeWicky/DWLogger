@@ -25,7 +25,7 @@
     if (self.text.length == 0 || self.value < 0) {
         return 0;
     }
-    self.countLabel.text = [NSString stringWithFormat:@"%ld",value];
+    self.countLabel.text = [NSString stringWithFormat:@"%ld",(long)value];
     CGSize size = [self.countLabel sizeThatFits:CGSizeMake(MAXFLOAT, 30)];
     ///如果有clearButton时不加间隔，否则加间隔
     CGFloat delta = Margin;
@@ -181,7 +181,7 @@
 }
 
 -(void)commitBtnAction:(UIButton *)sender {
-    if (self.searchCallback && self.txtF.text.length) {
+    if (self.searchCallback) {
         NSInteger resultCount = self.searchCallback(self.txtF.text);
         self.value = 0;
         self.stepper.value = 0;

@@ -58,6 +58,17 @@
  version 1.0.2.1
  冗余代码删除
  
+ version 1.0.3
+ 崩溃捕捉类更新
+ 
+ versino 1.0.4
+ 修复问题
+ 
+ version 1.0.5
+ 日志最大显示长度属性添加
+ 修改搜索交互
+ 改善更新列表逻辑
+ 
  */
 
 #ifndef DWLogger_h
