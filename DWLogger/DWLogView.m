@@ -726,8 +726,10 @@ static DWLogView * loggerView = nil;
     if ([DWLogView shareLogView].isShowing) {
         sender.selected = !sender.selected;
         if (sender.selected) {
+            [DWLogView shareLogView].backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
             [DWLogView enableUserInteraction];
         } else {
+            [DWLogView shareLogView].backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
             [DWLogView disableUserInteraction];
         }
     }
