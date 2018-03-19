@@ -8,6 +8,7 @@
 
 #import "DWLogManager.h"
 #import "DWLogger.h"
+#import "DWLogView.h"
 #import "DWFileManager.h"
 #import "UIDevice+DWDeviceUtils.h"
 #import "DWCrashCollector.h"

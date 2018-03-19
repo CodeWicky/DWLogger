@@ -11,6 +11,8 @@ s.ios.deployment_target = '7.0'
 s.source_files = 'DWLogger/**/{DWLogger,DWSearchView,DWLogManager,DWLogView,DWCrashCollector}.{h,m}'
 s.resource = 'DWLogger/**/*.{bundle}'
 s.frameworks = 'UIKit'
+s.prefix_header_contents = '#import "DWLogger.h"'
+
 s.dependency 'DWTableViewHelper', '~> 1.1.5'
 s.dependency 'DWCheckBox', '~> 1.0.3'
 

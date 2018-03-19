@@ -75,7 +75,6 @@
 #define DWLogger_h
 
 #import "DWLogManager.h"
-#import "DWLogView.h"
 
 #if DEBUG
 ///开发环境标识符
