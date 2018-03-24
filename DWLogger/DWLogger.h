@@ -75,6 +75,9 @@
  添加交互模式下透明度展示
  改变头文件引用逻辑，优化pch中表现
  
+ version 1.0.6.1
+ 修复并行下tableView更新崩溃问题
+ 
  */
 
 #ifndef DWLogger_h

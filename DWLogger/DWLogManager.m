@@ -28,6 +28,8 @@ static DWLogManager * mgr = nil;
 
 @property (nonatomic ,strong) dispatch_queue_t writeFileQueue;
 
+@property (nonatomic ,strong) dispatch_queue_t updateLogQueue;
+
 @end
 
 @implementation DWLogManager
@@ -43,6 +45,7 @@ static DWLogManager * mgr = nil;
         mgr = [[DWLogManager alloc] init];
         mgr.logFilter = DWLoggerAll;
         mgr.maxLogLength = MaxLogLength;
+        mgr.updateLogQueue = dispatch_queue_create("com.updateLogQueue.DWLogManager", NULL);
         NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
         [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSSSSS"];
         [mgr configFormatter:formatter];
@@ -83,10 +86,12 @@ static DWLogManager * mgr = nil;
         model.absoluteLog = log;
         model.logString = aStr;
         model.filter = filter;
-        [[DWLogView loggerContainer] addObject:model];
-        if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
-            [DWLogView updateLog:model filter:filter];
-        }
+        dispatch_async(logger.updateLogQueue, ^{
+            [[DWLogView loggerContainer] addObject:model];
+            if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
+                [DWLogView updateLog:model filter:filter];
+            }
+        });
     }
     if (logger.autoBackUp) {
         static dispatch_once_t onceToken;
