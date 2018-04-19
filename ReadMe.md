@@ -169,12 +169,12 @@ Except five buttons,there is a searchBar above,your can search log with key word
 Attention!The range of searching is the same with current displaying.In other words if you select normal level,then the search range is global logs and normal logs.
 
 ## 联系作者
-你可以通过在[我的Github](https://github.com/CodeWicky/DWLogger)上给我留言或者给我发送电子邮件[codeWicky@163.com]()来给我提一些建议或者指出我的bug,我将不胜感激。
+你可以通过在[我的Github](https://github.com/CodeWicky/DWLogger)上给我留言或者给我发送电子邮件 codeWicky@163.com 来给我提一些建议或者指出我的bug,我将不胜感激。
 
 如果你喜欢这个小东西，记得给我一个star吧，么么哒~ 
 
 ## Contact With Me
 
-You may issue me on [my Github](https://github.com/CodeWicky/DWLogger) or send me a email at [codeWicky@163.com]() to tell me some advices or the bug,I will be so appreciated.
+You may issue me on [my Github](https://github.com/CodeWicky/DWLogger) or send me a email at codeWicky@163.com to tell me some advices or the bug,I will be so appreciated.
 
 If you like it please give me a star.
