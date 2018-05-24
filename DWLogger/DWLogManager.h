@@ -74,9 +74,16 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
 ///A flag indicates whether need log detail.（Default NO）
 @property (nonatomic ,assign) BOOL particularLog;
 
+///仅autoBackUp与saveLocalLog同时为YES时才备份日志至本地。autoBackUp用来进行全局控制，saveLocalLog用来进行过程中控制。
+///Only when autoBackUp and saveLocalLog are both YES Logger should backup log to disk.You may use autoBackUp as global control and saveLocalLog as save switch.
+
 ///是否自动备份日志至沙盒（默认为NO）
 ///A flag indicates whether auto backup log to disk.（Default NO）
 @property (nonatomic ,assign) BOOL autoBackUp;
+
+///本地保存日志（默认为YES）
+///A flag indicates whether save log to disk.(Default YES)
+@property (nonatomic ,assign) BOOL saveLocalLog;
 
 ///日志显示最大长度。（默认为1024 * 5个字符）
 ///The max length for log to show.（default by 1024 * 5）

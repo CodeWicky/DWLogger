@@ -71,7 +71,9 @@
 //    DWLog(@"111");
     static int i = 0;
     i++;
-    DWLogNormal(@"as%d",i);
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        DWLogNormal(@"as%d",i);
+    });
     
 //    DWLog(@"全局");
 //    DWLogNormal(@"normal");

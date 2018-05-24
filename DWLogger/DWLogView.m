@@ -27,6 +27,8 @@
 
 @property (nonatomic ,strong) UIButton * switchBtn;
 
+@property (nonatomic ,strong) UIButton * saveBtn;
+
 @property (nonatomic ,strong) UIButton * logSwitch;
 
 @property (nonatomic ,strong) UIButton * interactionBtn;
@@ -646,6 +648,7 @@ static DWLogView * loggerView = nil;
     [self.clearLogBtn setBackgroundImage:image(@"destroy") forState:(UIControlStateHighlighted)];
     self.interactionBtn = normalBtn(image(@"forbid"), image(@"clickable"), self, @selector(interfaceBtnAction:), tempFrm);
     self.logSwitch = normalBtn(image(@"invisible"), image(@"visible"), self, @selector(logSwitchBtnAction:), tempFrm);
+    self.saveBtn = normalBtn(image(@"local"), image(@"stop"), self, @selector(saveBtnAction:), tempFrm);
     self.switchBtn = normalBtn(image(@"menu"), nil, self, @selector(switchBtnAction:),switchBtnR);
     UIPanGestureRecognizer * pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panBtnAction:)];
     pan.delegate = self;
@@ -738,6 +741,15 @@ static DWLogView * loggerView = nil;
         [self showItems];
     }
     sender.selected = !sender.selected;
+}
+
+-(void)saveBtnAction:(UIButton *)sender {
+    sender.selected = !sender.selected;
+    if (sender.selected) {
+        [DWLogManager shareLogManager].saveLocalLog = NO;
+    } else {
+        [DWLogManager shareLogManager].saveLocalLog = YES;
+    }
 }
 
 -(void)logSwitchBtnAction:(UIButton *)sender
@@ -951,7 +963,7 @@ static DWLogView * loggerView = nil;
 #pragma mark --- setter/getter ---
 -(NSArray *)itemsArr {
     if (!_itemsArr) {
-        _itemsArr = @[self.logSwitch,self.interactionBtn,self.clearLogBtn,self.modeBtn];
+        _itemsArr = @[self.saveBtn,self.logSwitch,self.interactionBtn,self.clearLogBtn,self.modeBtn];
     }
     return _itemsArr;
 }
