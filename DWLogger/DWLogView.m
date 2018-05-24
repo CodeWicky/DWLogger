@@ -17,7 +17,7 @@
 #define SpeedScale 400
 #define CheckViewHeight 102
 
-@interface DWFloatPotViewController : UIViewController
+@interface DWFloatPotViewController : UIViewController<UIGestureRecognizerDelegate>
 
 @property (nonatomic ,assign) CGFloat width;
 
@@ -38,6 +38,8 @@
 @property (nonatomic ,assign) BOOL disableClick;
 
 @property (nonatomic ,strong) UIPanGestureRecognizer * panGes;
+
+@property (nonatomic ,strong) UILongPressGestureRecognizer * longGes;
 
 @property (nonatomic ,strong) NSArray <UIView *>* itemsArr;
 
@@ -646,8 +648,13 @@ static DWLogView * loggerView = nil;
     self.logSwitch = normalBtn(image(@"invisible"), image(@"visible"), self, @selector(logSwitchBtnAction:), tempFrm);
     self.switchBtn = normalBtn(image(@"menu"), nil, self, @selector(switchBtnAction:),switchBtnR);
     UIPanGestureRecognizer * pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panBtnAction:)];
+    pan.delegate = self;
     self.panGes = pan;
     [self.switchBtn addGestureRecognizer:pan];
+    UILongPressGestureRecognizer * longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressAction:)];
+    longPress.delegate = self;
+    self.longGes = longPress;
+    [self.switchBtn addGestureRecognizer:longPress];
     
     if ([DWLogView shareLogView].isShowing) {
         self.logSwitch.selected = YES;
@@ -661,6 +668,29 @@ static DWLogView * loggerView = nil;
 }
 
 #pragma mark --- btnAction ---
+-(void)longPressAction:(UILongPressGestureRecognizer *)sender {
+    if (sender.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+    
+    ///添加记号操作
+    static int counter = 0;
+    ///打印记号
+    DWLog(@"DWLogger Marker %d",counter);
+    counter++;
+    
+    ///背景色动画
+    CABasicAnimation * bgC = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
+    bgC.fromValue = (id)[UIColor clearColor].CGColor;
+    bgC.toValue = (id)[UIColor whiteColor].CGColor;
+    bgC.duration = 0.2;
+    bgC.timingFunction = [CAMediaTimingFunction functionWithName:kCAAnimationLinear];
+    bgC.fillMode = kCAFillModeForwards;
+    bgC.removedOnCompletion = YES;
+    bgC.autoreverses = YES;
+    [self.view.layer addAnimation:bgC forKey:@"ani"];
+}
+
 -(void)panBtnAction:(UIPanGestureRecognizer *)sender
 {
     CGPoint p = [sender locationInView:self.view];
@@ -707,7 +737,6 @@ static DWLogView * loggerView = nil;
         }];
         [self showItems];
     }
-    self.panGes.enabled = sender.selected;
     sender.selected = !sender.selected;
 }
 
@@ -758,6 +787,17 @@ static DWLogView * loggerView = nil;
         [self showCheckView];
     } else {
         [self hideCheckView];
+    }
+}
+
+#pragma mark --- gesture delegate ---
+-(BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if ([gestureRecognizer isEqual:self.panGes]) {
+        return !self.switchBtn.selected;
+    } else if ([gestureRecognizer isEqual:self.longGes]) {
+        return YES;
+    } else {
+        return NO;
     }
 }
 

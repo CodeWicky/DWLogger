@@ -18,7 +18,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    [DWLogManager configDefaultLogger];
+    [DWLogManager configLoggerWithFilter:DWLoggerAll needLogView:YES];
     [DWLogManager configToCollectCrash];
     [DWLogManager printLoggerMainPath];
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
