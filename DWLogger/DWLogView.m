@@ -361,17 +361,6 @@ static DWFloatPot * pot = nil;
         return;
     }
     
-    NSMutableArray * result = nil;
-    ///搜索状态
-    if (self.searchView.text.length) {
-        ///获取符合条件数组
-        result = [self searchIndexArrayFromCondition:self.searchView.text];
-        self.searchIndexArray = result;
-        
-        ///更新搜索控件结果数
-        [self.searchView updateResultCount:result.count];
-    }
-    
     [self insertTabWithIndexPaths:@[idxP]];
 }
 
@@ -476,6 +465,7 @@ static DWFloatPot * pot = nil;
         self.helper = [[DWTableViewHelper alloc] initWithTabV:_mainTab dataSource:self.dataArr];
         self.helper.useAutoRowHeight = YES;
         _mainTab.estimatedRowHeight = 0;
+        _mainTab.scrollsToTop = NO;
         _mainTab.backgroundColor = [UIColor clearColor];
         _mainTab.showsVerticalScrollIndicator = NO;
         _mainTab.showsHorizontalScrollIndicator = NO;
@@ -611,14 +601,19 @@ static DWLogView * loggerView = nil;
     
     
     ///非全部展示时以filterLogArray为数据源，此时符合条件才添加元素至数据源
+    BOOL needInsert = YES;
     if (vc.filterLogArray) {
         if (logModel && filter & [DWLogManager shareLogManager].logFilter) {
             [vc.filterLogArray addObject:logModel];
+        } else {
+            needInsert = NO;
         }
     }
     
-    ///数据源不发生变化，插入列表并按需滚动
-    [vc insertMainTab];
+    ///数据源发生变化，插入列表并按需滚动
+    if (needInsert) {
+        [vc insertMainTab];
+    }
 }
 
 +(NSMutableArray *)filterDataArr:(NSArray <DWLogModel *>*)dataArr filter:(DWLoggerFilter)filter {
@@ -1045,7 +1040,7 @@ static DWLogView * loggerView = nil;
 #pragma mark --- setter/getter ---
 -(NSArray *)itemsArr {
     if (!_itemsArr) {
-        _itemsArr = @[self.saveBtn,self.logSwitch,self.interactionBtn,self.clearLogBtn,self.modeBtn];
+        _itemsArr = @[self.logSwitch,self.saveBtn,self.interactionBtn,self.clearLogBtn,self.modeBtn];
     }
     return _itemsArr;
 }

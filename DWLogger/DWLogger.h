@@ -78,6 +78,12 @@
  version 1.0.6.1
  修复并行下tableView更新崩溃问题
  
+ version 1.0.7
+ 添加控制日志是否写本地开关
+ 添加Logger打点交互
+ 优化列表刷新逻辑（非展开模式不刷新列表，只更新数据源）
+ 修复过滤模式下添加被过滤掉的日志模式引起的刷新崩溃问题（DWLogView.m line:614）
+ 
  */
 
 #ifndef DWLogger_h
