@@ -20,6 +20,8 @@
  DWLogWarning() 此模式为警告模式，输出警告信息，可通过过滤器控制显隐
  DWLogError() 此模式为错误模式，输出错误信息，可通过过滤器控制显隐
  
+ 使用时在pch中引用DWLogger.h即可完成Log的全局替换。
+ 
  请在Appdelegate中程序启动后调用[DWLogManager configDefaultLogger]进行日志捕捉。若想在Debug模式下手机崩溃日志可调用[DWLogManager configToCollectCrash]进行手机。
  
  其他一些辅助工具属性请查看DWLogManager中属性注释并合理使用。
@@ -69,13 +71,19 @@
  修改搜索交互
  改善更新列表逻辑
  
+ version 1.0.6
+ 添加交互模式下透明度展示
+ 改变头文件引用逻辑，优化pch中表现
+ 
+ version 1.0.6.1
+ 修复并行下tableView更新崩溃问题
+ 
  */
 
 #ifndef DWLogger_h
 #define DWLogger_h
 
 #import "DWLogManager.h"
-#import "DWLogView.h"
 
 #if DEBUG
 ///开发环境标识符
