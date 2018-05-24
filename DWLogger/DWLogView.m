@@ -73,6 +73,12 @@
 
 @property (nonatomic ,assign) NSInteger highlightIndex;
 
+@property (nonatomic ,assign) BOOL needReloadTab;
+
+@property (nonatomic ,assign) BOOL needInsertTab;
+
+@property (nonatomic ,strong) NSMutableArray * insertTempArray;
+
 @end
 
 
@@ -343,16 +349,17 @@ static DWFloatPot * pot = nil;
 
 ///插入列表
 -(void)insertMainTab {
-    ///插入列表末尾项
-    /*
-     插入列表时应该考虑是否为搜索状态，不同状态下有不同的交互模式
-     1.非搜索模式或无搜索结果
-     此状态下无高亮显示的当前结果，故此时插入列表后直接滚动至列表末尾即可
-     2.为搜索模式且搜索结果仅有一个
-     此时说明从无高亮状态进入有高亮状态，且高亮状态为列表末尾，故插入列表后滚动至列表末尾并高亮
-     3.为搜索模式且当前存在高亮状态
-     此状态说明更新的条目为查找项，但当前展示即为更新前的高亮项目，此时插入列表后不做列表滚动，保持当前高亮状态的查看
-     */
+    
+    ///计算末位项
+    NSInteger count = self.helper.dataSource.count;
+    NSIndexPath * idxP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
+    
+    ///记录需要插入状态并将idxP存入插入数组
+    if (![DWLogView shareLogView].isShowing) {
+        self.needInsertTab = YES;
+        [self.insertTempArray addObject:idxP];
+        return;
+    }
     
     NSMutableArray * result = nil;
     ///搜索状态
@@ -365,17 +372,7 @@ static DWFloatPot * pot = nil;
         [self.searchView updateResultCount:result.count];
     }
     
-    ///根据搜索结果数区分三种状态
-    NSInteger count = self.helper.dataSource.count;
-    NSIndexPath * idxP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
-    [self.mainTab insertRowsAtIndexPaths:@[idxP] withRowAnimation:(UITableViewRowAnimationNone)];
-    if (result.count == 0) {///非搜索模式或无搜索结果
-        [self.mainTab scrollToRowAtIndexPath:idxP atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    } else if (result.count == 1) {///为搜索模式且搜索结果仅有一个
-        [self changeSearchIndex:0];
-    } else {///为搜索模式且当前存在高亮状态
-        ///Do nothing.
-    }
+    [self insertTabWithIndexPaths:@[idxP]];
 }
 
 ///改变cell高亮状态
@@ -392,6 +389,75 @@ static DWFloatPot * pot = nil;
     DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:idxP];
     if (cell) {
         [cell setBackgroundHighlight:highlight];
+    }
+}
+
+-(void)reloadTab {
+    NSUInteger count = self.helper.dataSource.count;
+    [self.helper reloadDataWithCompletion:^{
+        if (count == 0) {
+            return;
+        }
+        [self.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    }];
+}
+
+-(void)reloadTabIfNeeded {
+    if (self.needReloadTab) {
+        [self reloadTab];
+        self.needReloadTab = NO;
+        
+        ///此时因为能处于需要插入状态，由于已经整体刷新，故清除插入需求
+        if (self.needInsertTab) {
+            self.needInsertTab = NO;
+            [self.insertTempArray removeAllObjects];
+        }
+    }
+}
+
+-(void)insertTabWithIndexPaths:(NSArray *)indexPs {
+    ///插入列表末尾项
+    /*
+     插入列表时应该考虑是否为搜索状态，不同状态下有不同的交互模式
+     1.非搜索模式或无搜索结果
+     此状态下无高亮显示的当前结果，故此时插入列表后直接滚动至列表末尾即可
+     2.为搜索模式且搜索结果仅有一个
+     此时说明从无高亮状态进入有高亮状态，且高亮状态为列表末尾，故插入列表后滚动至列表末尾并高亮
+     3.为搜索模式且当前存在高亮状态
+     此状态说明更新的条目为查找项，但当前展示即为更新前的高亮项目，此时插入列表后不做列表滚动，保持当前高亮状态的查看
+     */
+    
+    if (indexPs.count == 0) {
+        return;
+    }
+    NSMutableArray * result = nil;
+    ///搜索状态
+    if (self.searchView.text.length) {
+        ///获取符合条件数组
+        result = [self searchIndexArrayFromCondition:self.searchView.text];
+        self.searchIndexArray = result;
+        
+        ///更新搜索控件结果数
+        [self.searchView updateResultCount:result.count];
+    }
+    
+    [self.mainTab insertRowsAtIndexPaths:indexPs withRowAnimation:(UITableViewRowAnimationNone)];
+    
+    ///根据搜索结果数区分三种状态
+    if (result.count == 0) {///非搜索模式或无搜索结果
+        [self.mainTab scrollToRowAtIndexPath:indexPs.lastObject atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    } else if (result.count == 1) {///为搜索模式且搜索结果仅有一个
+        [self changeSearchIndex:0];
+    } else {///为搜索模式且当前存在高亮状态
+        ///Do nothing.
+    }
+}
+
+-(void)insertTabIfNeeded {
+    if (self.needInsertTab && self.insertTempArray.count) {
+        [self insertTabWithIndexPaths:self.insertTempArray];
+        self.needInsertTab = NO;
+        [self.insertTempArray removeAllObjects];
     }
 }
 
@@ -441,6 +507,13 @@ static DWFloatPot * pot = nil;
     return _searchView;
 }
 
+-(NSMutableArray *)insertTempArray {
+    if (!_insertTempArray) {
+        _insertTempArray = [NSMutableArray array];
+    }
+    return _insertTempArray;
+}
+
 @end
 
 
@@ -469,6 +542,13 @@ static DWLogView * loggerView = nil;
     }];
     ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = YES;
     ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = [DWLogView shareLogView].interactionEnabled;
+    
+    DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+    if (vc.needReloadTab) {
+        [vc reloadTabIfNeeded];
+    } else {
+        [vc insertTabIfNeeded];
+    }
 }
 
 +(void)hideLogView {
@@ -516,13 +596,15 @@ static DWLogView * loggerView = nil;
             vc.filterLogArray = tempArr;
             vc.helper.dataSource = tempArr;
         }
-        NSUInteger count = vc.helper.dataSource.count;
-        [vc.helper reloadDataWithCompletion:^{
-            if (count == 0) {
-                return;
-            }
-            [vc.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-        }];
+        
+        ///视图未展示，此时不刷新列表，记录需要刷新列表需求
+        if (![DWLogView shareLogView].isShowing) {
+            vc.needReloadTab = YES;
+            vc.filterLogArrayNeedChange = NO;
+            return;
+        }
+        
+        [vc reloadTab];
         vc.filterLogArrayNeedChange = NO;
         return;
     }

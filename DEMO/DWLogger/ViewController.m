@@ -35,20 +35,20 @@
 //    DWLogError(@"错误");
 //    NSLog(@"系统");
 //    
-//    DWLog(@"全局");
-//    DWLogNormal(@"normal");
-//    DWLogInfo(@"信息");
-//    DWLogWarning(@"警告");
-//    DWLogError(@"错误");
-//    NSLog(@"系统");
+    DWLog(@"全局");
+    DWLogNormal(@"normal");
+    DWLogInfo(@"信息");
+    DWLogWarning(@"警告");
+    DWLogError(@"错误");
+    NSLog(@"系统");
 //    
-//    DWLog(@"全局");
-//    DWLogNormal(@"normal");
-//    DWLogInfo(@"信息");
-//    DWLogWarning(@"警告");
-//    DWLogError(@"错误");
-//    NSLog(@"系统");
-//    
+    DWLog(@"全局");
+    DWLogNormal(@"normal");
+    DWLogInfo(@"信息");
+    DWLogWarning(@"警告");
+    DWLogError(@"错误");
+    NSLog(@"系统");
+//
 //    DWLog(@"全局");
 //    DWLogNormal(@"normal");
 //    DWLogInfo(@"信息");
