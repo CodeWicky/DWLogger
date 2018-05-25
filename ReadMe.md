@@ -23,6 +23,8 @@ In more cases,it helps you read logs without connecting with computer,which help
 - 自动备份日志至磁盘
 - 自动收集崩溃日志并备份至磁盘，同时为崩溃前屏幕截图
 - 以关键字搜索指定日志
+- 即时控制是否收集日志至本地
+- 日志打点功能，更快定位特征日志点
 
 ## Func
 - Replacing NSLog with DWLogNormal automatically.
@@ -31,6 +33,8 @@ In more cases,it helps you read logs without connecting with computer,which help
 - Backing up log automatically.
 - Collecting crash log automatically and snap it.
 - Searching specified log with key word.
+- Controling save log to local at real-time.
+- Log Marker,help you find specific log.
 
 ## 如何使用
 首先，你应该将所需文件拖入工程中，或者你也可以用Cocoapods去集成他。
@@ -55,10 +59,11 @@ In more cases,it helps you read logs without connecting with computer,which help
 <p align="center" >
   <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E5%B1%95%E5%BC%80.png" width=207px height=368px alt="Expand" title="Expand">
   
-从右向左总共五个按钮，我依次介绍：
+从右向左总共六个按钮，我依次介绍：
 
 右数第一个：收起状态按钮
 > 收起菜单至收起状态，也就是一般状态。
+> 长按为日志打点功能。
 
 右数第二个：展示日志按钮
 > 图例中为不可见状态，即不展示屏幕日志。点击后为可见状态，即展示屏幕日志。
@@ -68,13 +73,16 @@ In more cases,it helps you read logs without connecting with computer,which help
 
 上图即是展示屏幕日志的状态，当然不会有那个等级菜单。
 
-右数第三个：响应控制按钮
+右数第三个：控制是否收集日志至本地按钮
+> 图例中状态为收集日志至本地状态，点击后为停止收集状态。
+
+右数第四个：响应控制按钮
 > 图例中为接受响应状态，及手势等控制均由屏幕日志窗口接收。点击后为拒绝响应状态，该状态屏幕日志窗口不接收响应事件，由App端接收响应。（不展示屏幕日志状态下响应控制按钮失效且默认有App端接收响应）
 
-右数第四个：清除当前屏幕日志
+右数第五个：清除当前屏幕日志
 > 点击后清除当前屏幕日志（不影响备份至磁盘的日志）
 
-右数第五个：日志等级选择
+右数第六个：日志等级选择
 > 点击后展示等级选择菜单，选择将要查看的日志等级，勾选中的等级展示，未勾选的屏蔽。再次点击或者点击屏幕中任意非按钮位置收起等级选择菜单，屏蔽日志生效。
 
 <p align="center" >
@@ -93,7 +101,7 @@ DWLogger提供了5个日志等级：
 
 通过调用五个等级的API来决定日志等级。  
 
-除了五个按钮，上方还有搜索栏，用来以关键字搜索日志。
+除了六个按钮，上方还有搜索栏，用来以关键字搜索日志。
 
 <p align="center" >
   <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E6%90%9C%E7%B4%A2%E6%97%A5%E5%BF%97.png" width=207px height=368px alt="Search" title="Search">
@@ -127,6 +135,7 @@ I will introduce the function of the five buttons from right to left：
 
 No 1. from right：Close the menu.
 > Close the menu to normal state.
+> Long press to make a Marker.
 
 No 2.：Display logs.
 > Picture above is invisible state.Turing into visible state after clicking the button like picture below.
@@ -136,13 +145,16 @@ No 2.：Display logs.
 
 This picture is visible state.Sure,ignore the checkBox.
 
-No 3.：Interaction control button.
+No 3.：Save log to local.
+> It's save mode in above picture,it will stop save by clicking this.
+
+No 4.：Interaction control button.
 > It's interaction enabled mode in above picture,touches will be recognized by log window.After clicking the button the log window won't recognized touches,so you can control your App.(It will force not to recognized touches when the log window is invisible.)  
 
-No 4.：Clear logs on mobile screen.
+No 5.：Clear logs on mobile screen.
 > Clear logs on mobile screen after click it.（Have no influnce on logs back-up.）
 
-No 5.：Choose log level.
+No 6.：Choose log level.
 > Show log level menu by clicking,and choose which level you prefer to,it will display the level you choose but shield the others.Click the button again or somewhere else on screen to close log level menu and the configuration will make sense then.
 
 <p align="center" >
@@ -161,7 +173,7 @@ DWLogger provide 5 log levels：
 
 Call different API to print different level log.  
 
-Except five buttons,there is a searchBar above,your can search log with key word.
+Except six buttons,there is a searchBar above,your can search log with key word.
 
 <p align="center" >
   <img src="https://github.com/CodeWicky/DWLogger/raw/master/%E6%90%9C%E7%B4%A2%E6%97%A5%E5%BF%97.png" width=207px height=368px alt="Search" title="Search">
