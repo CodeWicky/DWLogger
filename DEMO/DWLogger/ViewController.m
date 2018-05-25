@@ -48,6 +48,9 @@
     DWLogWarning(@"警告");
     DWLogError(@"错误");
     NSLog(@"系统");
+    
+    
+    
 //
 //    DWLog(@"全局");
 //    DWLogNormal(@"normal");
@@ -74,6 +77,10 @@
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         DWLogNormal(@"as%d",i);
     });
+    
+//    for (int i = 0; i < 10000; i++) {
+//        NSLog(@"%d",i);
+//    }
     
 //    DWLog(@"全局");
 //    DWLogNormal(@"normal");

@@ -71,13 +71,17 @@
 
 @property (nonatomic ,strong) NSMutableArray * searchIndexArray;
 
+@property (nonatomic ,assign) BOOL searchMode;
+
 @property (nonatomic ,assign) NSInteger highlightIndex;
 
-@property (nonatomic ,assign) BOOL needReloadTab;
+@property (nonatomic ,assign) BOOL needModeChangeReloadTab;
 
-@property (nonatomic ,assign) BOOL needInsertTab;
+@property (nonatomic ,assign) BOOL needDataSourceChangeReloadTab;
 
-@property (nonatomic ,strong) NSMutableArray * insertTempArray;
+@property (nonatomic ,assign) BOOL needLogPoolReloadTab;
+
+@property (nonatomic ,assign) NSUInteger loadedCount;
 
 @end
 
@@ -162,6 +166,8 @@ static DWFloatPot * pot = nil;
 
 @property (nonatomic ,strong) UILabel * logLb;
 
+@property (nonatomic ,assign) BOOL highlight;
+
 -(void)setBackgroundHighlight:(BOOL)highlight;
 
 @end
@@ -176,13 +182,16 @@ static DWFloatPot * pot = nil;
  */
 -(void)setBackgroundHighlight:(BOOL)highlight {
     if (highlight) {
-        self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.7];
-        [UIView animateWithDuration:0.4 animations:^{
-            self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.3];
-        }];
+        if (!self.highlight) {
+            self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.7];
+            [UIView animateWithDuration:0.4 animations:^{
+                self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.3];
+            }];
+        }
     } else {
         self.contentView.backgroundColor = [UIColor clearColor];
     }
+    self.highlight = highlight;
 }
 
 
@@ -210,15 +219,8 @@ static DWFloatPot * pot = nil;
     [super setModel:model];
     self.logLb.attributedText = model.logString;
     if (!self.just4Cal) {
-        if (model.highlighted) {
-            [self setBackgroundHighlight:model.highlighted];
-        }
+        [self setBackgroundHighlight:model.highlighted];
     }
-}
-
--(void)prepareForReuse {
-    [super prepareForReuse];
-    [self setBackgroundHighlight:NO];
 }
 
 @end
@@ -240,6 +242,8 @@ static DWFloatPot * pot = nil;
     } else {
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
+    NSThread * logPoolThread = [[NSThread alloc] initWithTarget:self selector:@selector(configLogPoolTimer) object:nil];
+    [logPoolThread start];
 }
 
 #pragma mark --- tool method ---
@@ -347,23 +351,6 @@ static DWFloatPot * pot = nil;
     }
 }
 
-///插入列表
--(void)insertMainTab {
-    
-    ///计算末位项
-    NSInteger count = self.helper.dataSource.count;
-    NSIndexPath * idxP = [NSIndexPath indexPathForRow:count - 1 inSection:0];
-    
-    ///记录需要插入状态并将idxP存入插入数组
-    if (![DWLogView shareLogView].isShowing) {
-        self.needInsertTab = YES;
-        [self.insertTempArray addObject:idxP];
-        return;
-    }
-    
-    [self insertTabWithIndexPaths:@[idxP]];
-}
-
 ///改变cell高亮状态
 -(void)changeCellHighlight:(BOOL)highlight atIndexPath:(NSIndexPath *)idxP {
     
@@ -381,72 +368,74 @@ static DWFloatPot * pot = nil;
     }
 }
 
--(void)reloadTab {
-    NSUInteger count = self.helper.dataSource.count;
-    [self.helper reloadDataWithCompletion:^{
-        if (count == 0) {
-            return;
-        }
-        [self.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    }];
-}
-
 -(void)reloadTabIfNeeded {
-    if (self.needReloadTab) {
-        [self reloadTab];
-        self.needReloadTab = NO;
-        
-        ///此时因为能处于需要插入状态，由于已经整体刷新，故清除插入需求
-        if (self.needInsertTab) {
-            self.needInsertTab = NO;
-            [self.insertTempArray removeAllObjects];
-        }
+    if (self.needModeChangeReloadTab) {
+        [self reloadTabWithChangeMode:YES completion:^{
+            self.needModeChangeReloadTab = NO;
+            self.needDataSourceChangeReloadTab = NO;
+        }];
+    } else if (self.needDataSourceChangeReloadTab) {
+        [self reloadTabWithChangeMode:NO completion:^{
+            self.needDataSourceChangeReloadTab = NO;
+        }];
     }
 }
 
--(void)insertTabWithIndexPaths:(NSArray *)indexPs {
-    ///插入列表末尾项
+-(void)reloadTabWithChangeMode:(BOOL)changeMod completion:(dispatch_block_t)completion {
     /*
-     插入列表时应该考虑是否为搜索状态，不同状态下有不同的交互模式
-     1.非搜索模式或无搜索结果
-     此状态下无高亮显示的当前结果，故此时插入列表后直接滚动至列表末尾即可
-     2.为搜索模式且搜索结果仅有一个
-     此时说明从无高亮状态进入有高亮状态，且高亮状态为列表末尾，故插入列表后滚动至列表末尾并高亮
-     3.为搜索模式且当前存在高亮状态
-     此状态说明更新的条目为查找项，但当前展示即为更新前的高亮项目，此时插入列表后不做列表滚动，保持当前高亮状态的查看
+     刷新列表时应该考虑是否为过滤切换模式，如果不是在考虑是否为搜索模式，不同状态下有不同的交互模式
+     1.过滤切换模式
+     此模式下由于数据源已经切换完成，故此时刷新列表并滚动至列表末尾即可
+     2.非搜索模式或无搜索结果
+     此状态下无高亮显示的当前结果，故此时刷新列表并滚动至列表末尾即可
+     3.为搜索模式且搜索结果仅有一个
+     此时说明从无高亮状态进入有高亮状态，且高亮状态为列表末尾，故刷新列表后滚动至列表末尾并高亮
+     4.为搜索模式且当前存在高亮状态
+     此状态说明更新的条目为查找项，但当前展示即为更新前的高亮项目，此时刷新列表后不做列表滚动，保持当前高亮状态的查看
      */
     
-    if (indexPs.count == 0) {
-        return;
-    }
     NSMutableArray * result = nil;
     ///搜索状态
-    if (self.searchView.text.length) {
+    if (!changeMod && self.searchMode) {
         ///获取符合条件数组
         result = [self searchIndexArrayFromCondition:self.searchView.text];
         self.searchIndexArray = result;
         
+        
         ///更新搜索控件结果数
         [self.searchView updateResultCount:result.count];
     }
-    
-    [self.mainTab insertRowsAtIndexPaths:indexPs withRowAnimation:(UITableViewRowAnimationNone)];
-    
-    ///根据搜索结果数区分三种状态
-    if (result.count == 0) {///非搜索模式或无搜索结果
-        [self.mainTab scrollToRowAtIndexPath:indexPs.lastObject atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    } else if (result.count == 1) {///为搜索模式且搜索结果仅有一个
-        [self changeSearchIndex:0];
-    } else {///为搜索模式且当前存在高亮状态
-        ///Do nothing.
-    }
+    NSUInteger count = self.helper.dataSource.count;
+    [self.helper reloadDataWithCompletion:^{
+        ///根据搜索结果数区分三种状态
+        if (result.count == 0) {///非搜索模式或无搜索结果
+            [self.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+        } else if (result.count == 1) {///为搜索模式且搜索结果仅有一个
+            [self changeSearchIndex:0];
+        } else {///为搜索模式且当前存在高亮状态
+            ///Do nothing.
+        }
+        !completion?:completion();
+    }];
 }
 
--(void)insertTabIfNeeded {
-    if (self.needInsertTab && self.insertTempArray.count) {
-        [self insertTabWithIndexPaths:self.insertTempArray];
-        self.needInsertTab = NO;
-        [self.insertTempArray removeAllObjects];
+#pragma mark --- logPoolMethod ---
+-(void)configLogPoolTimer {
+    @autoreleasepool {
+        [[NSThread currentThread] setName:@"DWLogger"];
+        NSRunLoop * r = [NSRunLoop currentRunLoop];
+        NSTimer * timer = [NSTimer timerWithTimeInterval:0.5 target:self selector:@selector(logPoolTimerAction:) userInfo:nil repeats:YES];
+        [r addTimer:timer forMode:NSRunLoopCommonModes];
+        [r run];
+    }
+    
+}
+
+-(void)logPoolTimerAction:(NSTimer *)timer {
+    if (self.needLogPoolReloadTab || self.loadedCount != self.helper.dataSource.count) {
+        self.needLogPoolReloadTab = NO;
+        self.loadedCount = self.helper.dataSource.count;
+        [self reloadTabWithChangeMode:NO completion:nil];
     }
 }
 
@@ -487,6 +476,7 @@ static DWFloatPot * pot = nil;
         _searchView = [[DWSearchView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 0)];
         __weak typeof(self)weakSelf = self;
         _searchView.searchCallback = ^NSInteger(NSString *text) {
+            weakSelf.searchMode = (text.length != 0);
             [weakSelf searchCondition:text];
             return weakSelf.searchIndexArray.count;
         };
@@ -495,13 +485,6 @@ static DWFloatPot * pot = nil;
         };
     }
     return _searchView;
-}
-
--(NSMutableArray *)insertTempArray {
-    if (!_insertTempArray) {
-        _insertTempArray = [NSMutableArray array];
-    }
-    return _insertTempArray;
 }
 
 @end
@@ -533,12 +516,7 @@ static DWLogView * loggerView = nil;
     ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = YES;
     ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = [DWLogView shareLogView].interactionEnabled;
     
-    DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
-    if (vc.needReloadTab) {
-        [vc reloadTabIfNeeded];
-    } else {
-        [vc insertTabIfNeeded];
-    }
+    [((DWLogViewController *)[DWLogView shareLogView].rootViewController) reloadTabIfNeeded];
 }
 
 +(void)hideLogView {
@@ -589,12 +567,12 @@ static DWLogView * loggerView = nil;
         
         ///视图未展示，此时不刷新列表，记录需要刷新列表需求
         if (![DWLogView shareLogView].isShowing) {
-            vc.needReloadTab = YES;
+            vc.needModeChangeReloadTab = YES;
             vc.filterLogArrayNeedChange = NO;
             return;
         }
         
-        [vc reloadTab];
+        [vc reloadTabWithChangeMode:YES completion:nil];
         vc.filterLogArrayNeedChange = NO;
         return;
     }
@@ -612,7 +590,14 @@ static DWLogView * loggerView = nil;
     
     ///数据源发生变化，插入列表并按需滚动
     if (needInsert) {
-        [vc insertMainTab];
+        ///记录需要插入状态并将idxP存入插入数组
+        if (![DWLogView shareLogView].isShowing) {
+            vc.needDataSourceChangeReloadTab = YES;
+            return;
+        }
+        
+        ///用标志位标识列表需要刷新，timer每0.5秒按需刷新一次列表来模拟缓冲池，是为了防止后一个刷新请求被前一个刷新请求抵消掉刷新时还会判断数据源个数是否与当前相同
+        vc.needLogPoolReloadTab = YES;
     }
 }
 
@@ -674,9 +659,13 @@ static DWLogView * loggerView = nil;
     if (view) {///当点击搜索框的textField之外时，应注意去除响应者并如果此时如果为非搜索状态应清楚搜索结果
         if ([view isEqual:self]) {///若果是window本身则无可响应者，即点击在窗口上，应释放第一响应者。
             [logVC.searchView endEditing:YES];
-            if (!logVC.searchView.text.length && logVC.searchIndexArray.count) {
-                [logVC clearSearchResultWithResetSearchView:YES];
+            if (!logVC.searchView.text.length) {
+                logVC.searchMode = NO;
+                if (logVC.searchIndexArray.count) {
+                    [logVC clearSearchResultWithResetSearchView:YES];
+                }
             }
+            
         } else {///否则找到当前响应视图的是否在tableView上，如果在则释放搜索栏的响应者
             UIView * temp = view;
             while (temp.superview && temp.superview != logVC.view) {
@@ -684,8 +673,11 @@ static DWLogView * loggerView = nil;
             }
             if ([temp isEqual:logVC.mainTab]) {
                 [logVC.searchView endEditing:YES];
-                if (!logVC.searchView.text.length && logVC.searchIndexArray.count) {
-                    [logVC clearSearchResultWithResetSearchView:YES];
+                if (!logVC.searchView.text.length) {
+                    logVC.searchMode = NO;
+                    if (logVC.searchIndexArray.count) {
+                        [logVC clearSearchResultWithResetSearchView:YES];
+                    }
                 }
             }
         }

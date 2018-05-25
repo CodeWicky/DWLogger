@@ -10,13 +10,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../DWLogger/DWLogView.m"
-            timestampString = "548866344.90538"
+            timestampString = "548934425.45497"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1026"
-            endingLineNumber = "1026"
-            landmarkName = "-hideCheckView"
-            landmarkType = "7">
+            startingLineNumber = "225"
+            endingLineNumber = "225"
+            landmarkName = "DWlogCell"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -26,28 +26,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../DWLogger/DWLogView.m"
-            timestampString = "548866344.905713"
+            timestampString = "548934464.926596"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "576"
-            endingLineNumber = "576"
-            landmarkName = "+updateLog:filter:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../DWLogger/DWLogView.m"
-            timestampString = "548866344.905924"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "354"
-            endingLineNumber = "354"
-            landmarkName = "-insertMainTab"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
+            landmarkName = "-setupUI"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

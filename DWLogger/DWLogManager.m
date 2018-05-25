@@ -28,6 +28,8 @@ static DWLogManager * mgr = nil;
 
 @property (nonatomic ,strong) dispatch_queue_t writeFileQueue;
 
+@property (nonatomic ,strong) dispatch_queue_t updateLogQueue;
+
 @end
 
 @implementation DWLogManager
@@ -84,12 +86,16 @@ static DWLogManager * mgr = nil;
         model.absoluteLog = log;
         model.logString = aStr;
         model.filter = filter;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[DWLogView loggerContainer] addObject:model];
-            if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
-                [DWLogView updateLog:model filter:filter];
-            }
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            logger.updateLogQueue = dispatch_queue_create("com.updateLogQueue.DWLogManager", DISPATCH_QUEUE_SERIAL);
         });
+        dispatch_sync(logger.updateLogQueue, ^{
+            [[DWLogView loggerContainer] addObject:model];
+        });
+        if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
+            [DWLogView updateLog:model filter:filter];
+        }
     }
     if (logger.autoBackUp && logger.saveLocalLog) {
         static dispatch_once_t onceToken;

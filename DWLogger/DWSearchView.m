@@ -120,12 +120,19 @@
 }
 
 -(void)updateResultCount:(NSInteger)value {
-    if (value > 1) {
-        self.stepper.maximumValue = value - 1;
+    dispatch_block_t ab = ^(void){
+        if (value > 1) {
+            self.stepper.maximumValue = value - 1;
+        } else {
+            self.stepper.maximumValue = 0;
+        }
+        self.txtF.value = value;
+    };
+    if ([NSThread isMainThread]) {
+        ab();
     } else {
-        self.stepper.maximumValue = 0;
+        dispatch_sync(dispatch_get_main_queue(), ab);
     }
-    self.txtF.value = value;
 }
 
 #pragma mark --- tool method ---
