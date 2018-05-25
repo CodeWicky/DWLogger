@@ -10,6 +10,7 @@
 #import "DWLogger.h"
 #import "DWSearchView.h"
 
+
 @interface ViewController ()
 
 @end
@@ -25,29 +26,26 @@
     [self.view addSubview:red];
     red.backgroundColor = [UIColor redColor];
     
-//    DWSearchView * v = [[DWSearchView alloc] init];
-//    [self.view addSubview:v];
+    DWLog(@"全局");
+    DWLogNormal(@"normal");
+    DWLogInfo(@"信息");
+    DWLogWarning(@"警告");
+    DWLogError(@"错误");
+    NSLog(@"系统");
     
+    DWLog(@"全局");
+    DWLogNormal(@"normal");
+    DWLogInfo(@"信息");
+    DWLogWarning(@"警告");
+    DWLogError(@"错误");
+    NSLog(@"系统");
+//
 //    DWLog(@"全局");
 //    DWLogNormal(@"normal");
 //    DWLogInfo(@"信息");
 //    DWLogWarning(@"警告");
 //    DWLogError(@"错误");
 //    NSLog(@"系统");
-//    
-    DWLog(@"全局");
-    DWLogNormal(@"normal");
-    DWLogInfo(@"信息");
-    DWLogWarning(@"警告");
-    DWLogError(@"错误");
-    NSLog(@"系统");
-//    
-    DWLog(@"全局");
-    DWLogNormal(@"normal");
-    DWLogInfo(@"信息");
-    DWLogWarning(@"警告");
-    DWLogError(@"错误");
-    NSLog(@"系统");
     
     
     

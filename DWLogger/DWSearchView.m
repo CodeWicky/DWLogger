@@ -8,6 +8,39 @@
 
 #import "DWSearchView.h"
 
+///主线程取值
+#define safeMainThreadGetValue(a) \
+({\
+__block typeof(a)value;\
+safeMainThreadCode(value = a);\
+value;\
+});
+
+///主线程赋值（把b值赋给a）
+#define safeMainThreadSetValue(a,b) safeMainThreadCode(a = b)
+
+///主线程执行一句代码（无需分号）
+#define safeMainThreadCode(a) \
+do {\
+if ([NSThread isMainThread]) {\
+a;\
+} else {\
+dispatch_sync(dispatch_get_main_queue(), ^{\
+a;\
+});\
+}\
+} while (0)
+
+///主线程执行Block（a应该是一个dispatch_block_t）
+#define safeMainThreadBlock(a) \
+do {\
+if ([NSThread isMainThread]) {\
+a();\
+} else {\
+dispatch_sync(dispatch_get_main_queue(), a);\
+}\
+} while (0)
+
 #define Margin (5)
 
 @interface DWCountTextField : UITextField
@@ -25,7 +58,8 @@
     if (self.text.length == 0 || self.value < 0) {
         return 0;
     }
-    self.countLabel.text = [NSString stringWithFormat:@"%ld",(long)value];
+    NSString * stringValue = [NSString stringWithFormat:@"%ld",(long)value];
+    safeMainThreadSetValue(self.countLabel.text, stringValue);
     CGSize size = [self.countLabel sizeThatFits:CGSizeMake(MAXFLOAT, 30)];
     ///如果有clearButton时不加间隔，否则加间隔
     CGFloat delta = Margin;
@@ -88,7 +122,7 @@
 ///赋值时重绘
 -(void)setValue:(NSInteger)value {
     _value = value;
-    [self setNeedsLayout];
+    safeMainThreadCode([self setNeedsLayout]);
 }
 
 @end
@@ -113,26 +147,23 @@
 #pragma mark --- interface method ---
 -(void)reset {
     self.value = -1;
-    self.stepper.value = 0;
-    self.stepper.maximumValue = 0;
-    self.txtF.text = nil;
+    safeMainThreadBlock(^(){
+        self.stepper.value = 0;
+        self.stepper.maximumValue = 0;
+        self.txtF.text = nil;
+    });
     self.txtF.value = 0;
 }
 
 -(void)updateResultCount:(NSInteger)value {
-    dispatch_block_t ab = ^(void){
+    safeMainThreadBlock(^(){
         if (value > 1) {
             self.stepper.maximumValue = value - 1;
         } else {
             self.stepper.maximumValue = 0;
         }
         self.txtF.value = value;
-    };
-    if ([NSThread isMainThread]) {
-        ab();
-    } else {
-        dispatch_sync(dispatch_get_main_queue(), ab);
-    }
+    });
 }
 
 #pragma mark --- tool method ---

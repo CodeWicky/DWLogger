@@ -12,10 +12,43 @@
 #import "NSArray+DWArrayUtils.h"
 #import "DWSearchView.h"
 
-#define BtnLength 44
-#define BtnSpacing 20
-#define SpeedScale 400
-#define CheckViewHeight 102
+///主线程取值
+#define safeMainThreadGetValue(a) \
+({\
+__block typeof(a)value;\
+safeMainThreadCode(value = a);\
+value;\
+});
+
+///主线程赋值（把b值赋给a）
+#define safeMainThreadSetValue(a,b) safeMainThreadCode(a = b)
+
+///主线程执行一句代码（无需分号）
+#define safeMainThreadCode(a) \
+do {\
+if ([NSThread isMainThread]) {\
+a;\
+} else {\
+dispatch_sync(dispatch_get_main_queue(), ^{\
+a;\
+});\
+}\
+} while (0)
+
+///主线程执行Block（a应该是一个dispatch_block_t）
+#define safeMainThreadBlock(a) \
+do {\
+if ([NSThread isMainThread]) {\
+a();\
+} else {\
+dispatch_sync(dispatch_get_main_queue(), a);\
+}\
+} while (0)
+
+#define BtnLength (44)
+#define BtnSpacing (20)
+#define SpeedScale (400)
+#define CheckViewHeight (102)
 
 @interface DWFloatPotViewController : UIViewController<UIGestureRecognizerDelegate>
 
@@ -97,11 +130,13 @@ static DWFloatPot * pot = nil;
 #else
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        pot = [[DWFloatPot alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        pot.windowLevel = UIWindowLevelAlert + 2;
-        pot.backgroundColor = [UIColor clearColor];
-        pot.hidden = NO;
-        pot.rootViewController = [DWFloatPotViewController new];
+        safeMainThreadBlock(^(){
+            pot = [[DWFloatPot alloc] initWithFrame:[UIScreen mainScreen].bounds];
+            pot.windowLevel = UIWindowLevelAlert + 2;
+            pot.backgroundColor = [UIColor clearColor];
+            pot.hidden = NO;
+            pot.rootViewController = [DWFloatPotViewController new];
+        });
     });
     return pot;
 #endif
@@ -183,13 +218,16 @@ static DWFloatPot * pot = nil;
 -(void)setBackgroundHighlight:(BOOL)highlight {
     if (highlight) {
         if (!self.highlight) {
-            self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.7];
-            [UIView animateWithDuration:0.4 animations:^{
-                self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.3];
-            }];
+            safeMainThreadBlock(^(){
+                self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.7];
+                [UIView animateWithDuration:0.4 animations:^{
+                    self.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0 alpha:0.3];
+                }];
+            });
+            
         }
     } else {
-        self.contentView.backgroundColor = [UIColor clearColor];
+        safeMainThreadCode(self.contentView.backgroundColor = [UIColor clearColor]);
     }
     self.highlight = highlight;
 }
@@ -320,7 +358,7 @@ static DWFloatPot * pot = nil;
                 ///高亮当前搜索项目
                 [self changeCellHighlight:YES atIndexPath:idxP];
                 ///滚动至当前位置
-                [self.mainTab scrollToRowAtIndexPath:idxP atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+                safeMainThreadCode([self.mainTab scrollToRowAtIndexPath:idxP atScrollPosition:UITableViewScrollPositionMiddle animated:YES]);
                 ///记录当前位置
                 self.highlightIndex = idx;
             }
@@ -409,7 +447,7 @@ static DWFloatPot * pot = nil;
     [self.helper reloadDataWithCompletion:^{
         ///根据搜索结果数区分三种状态
         if (result.count == 0) {///非搜索模式或无搜索结果
-            [self.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+            safeMainThreadCode([self.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES]);
         } else if (result.count == 1) {///为搜索模式且搜索结果仅有一个
             [self changeSearchIndex:0];
         } else {///为搜索模式且当前存在高亮状态
@@ -428,7 +466,6 @@ static DWFloatPot * pot = nil;
         [r addTimer:timer forMode:NSRunLoopCommonModes];
         [r run];
     }
-    
 }
 
 -(void)logPoolTimerAction:(NSTimer *)timer {
@@ -497,36 +534,43 @@ static DWLogView * loggerView = nil;
 #pragma mark --- interface method ---
 
 +(void)enableUserInteraction {
-    [DWLogView shareLogView].userInteractionEnabled = YES;
-    if ([DWLogView shareLogView].isShowing) {
-        ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = YES;
-    }
+    safeMainThreadBlock(^(){
+        [DWLogView shareLogView].userInteractionEnabled = YES;
+        if ([DWLogView shareLogView].isShowing) {
+            ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = YES;
+        }
+    });
 }
 
 +(void)disableUserInteraction {
-    [DWLogView shareLogView].userInteractionEnabled = NO;
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = NO;
+    safeMainThreadBlock(^(){
+        [DWLogView shareLogView].userInteractionEnabled = NO;
+        ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = NO;
+    });
 }
 
 +(void)showLogView {
-    [DWLogView shareLogView].hidden = NO;
-    [UIView animateWithDuration:0.4 animations:^{
-        [DWLogView shareLogView].alpha = 1;
-    }];
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = YES;
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = [DWLogView shareLogView].interactionEnabled;
-    
-    [((DWLogViewController *)[DWLogView shareLogView].rootViewController) reloadTabIfNeeded];
+    safeMainThreadBlock(^(){
+        [DWLogView shareLogView].hidden = NO;
+        [UIView animateWithDuration:0.4 animations:^{
+            [DWLogView shareLogView].alpha = 1;
+        }];
+        ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = YES;
+        ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = [DWLogView shareLogView].interactionEnabled;
+        [((DWLogViewController *)[DWLogView shareLogView].rootViewController) reloadTabIfNeeded];
+    });
 }
 
 +(void)hideLogView {
-    [UIView animateWithDuration:0.4 animations:^{
-        [DWLogView shareLogView].alpha = 0;
-    } completion:^(BOOL finished) {
-        [DWLogView shareLogView].hidden = YES;
-    }];
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = NO;
-    ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = NO;
+    safeMainThreadBlock(^(){
+        [UIView animateWithDuration:0.4 animations:^{
+            [DWLogView shareLogView].alpha = 0;
+        } completion:^(BOOL finished) {
+            [DWLogView shareLogView].hidden = YES;
+        }];
+        ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).logSwitch.selected = NO;
+        ((DWFloatPotViewController *)[DWFloatPot sharePot].rootViewController).interactionBtn.selected = NO;
+    });
 }
 
 +(void)configDefaultLogView {
@@ -536,7 +580,8 @@ static DWLogView * loggerView = nil;
 }
 
 +(NSMutableArray *)loggerContainer {
-    return ((DWLogViewController *)[DWLogView shareLogView].rootViewController).dataArr;
+    DWLogViewController * vc = (DWLogViewController *)safeMainThreadGetValue([DWLogView shareLogView].rootViewController);
+    return  vc.dataArr;
 }
 
 +(void)updateLog:(DWLogModel *)logModel filter:(DWLoggerFilter)filter {
@@ -547,7 +592,7 @@ static DWLogView * loggerView = nil;
      搜索模式下更新时应注意高亮显示的刷新交互。
      */
     
-    DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+    DWLogViewController * vc = safeMainThreadGetValue((DWLogViewController *)[DWLogView shareLogView].rootViewController);
     
     ///过滤模式改变则数据源应发生相应变化，此时应清除搜索条件并刷新列表（由于此时数据源发生变化故无需考虑数据源中增添元素的问题）
     if (vc.filterLogArrayNeedChange) {
@@ -620,13 +665,15 @@ static DWLogView * loggerView = nil;
 #else
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        loggerView = [[DWLogView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        loggerView.windowLevel = UIWindowLevelAlert + 1;
-        loggerView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
-        loggerView.hidden = NO;
-        loggerView.alpha = 0;
-        loggerView.userInteractionEnabled = NO;
-        loggerView.rootViewController = [DWLogViewController new];
+        safeMainThreadBlock(^(){
+            loggerView = [[DWLogView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+            loggerView.windowLevel = UIWindowLevelAlert + 1;
+            loggerView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
+            loggerView.hidden = NO;
+            loggerView.alpha = 0;
+            loggerView.userInteractionEnabled = NO;
+            loggerView.rootViewController = [DWLogViewController new];
+        });
     });
     return loggerView;
 #endif
@@ -687,11 +734,13 @@ static DWLogView * loggerView = nil;
 
 #pragma mark --- setter/getter ---
 -(BOOL)isShowing {
-    return ![DWLogView shareLogView].hidden && [DWLogView shareLogView].alpha;
+    BOOL hidden = safeMainThreadGetValue([DWLogView shareLogView].hidden);
+    CGFloat alpha = safeMainThreadGetValue([DWLogView shareLogView].alpha);
+    return !hidden && alpha;
 }
 
 -(BOOL)interactionEnabled {
-    return self.userInteractionEnabled;
+    return safeMainThreadGetValue(self.userInteractionEnabled);
 }
 @end
 
@@ -860,7 +909,7 @@ static DWLogView * loggerView = nil;
      4.刷新列表
      */
     [DWLogManager clearCurrentLog];
-    DWLogViewController * vc = (DWLogViewController *)[DWLogView shareLogView].rootViewController;
+    DWLogViewController * vc = (DWLogViewController *)safeMainThreadGetValue([DWLogView shareLogView].rootViewController);
     [vc clearSearchResultWithResetSearchView:YES];
     [vc.filterLogArray removeAllObjects];
     [vc.helper reloadDataWithCompletion:nil];
