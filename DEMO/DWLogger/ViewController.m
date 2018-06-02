@@ -63,6 +63,8 @@
 //    DWLogWarning(@"警告");
 //    DWLogError(@"错误");
 //    NSLog(@"系统");
+    
+    NSLog(@"%@",@[@"我",@"们",@"都是",@"好孩子"]);
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {

@@ -13,7 +13,7 @@
 #import "UIDevice+DWDeviceUtils.h"
 #import "DWCrashCollector.h"
 
-#define FilePath [NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+#define FilePath [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:@"DWLogger"]
 
 #define NSRangeNull NSMakeRange(MAXFLOAT, MAXFLOAT)
 
