@@ -165,6 +165,14 @@ static DWFloatPot * pot = nil;
 #endif
 }
 
++(void)enableSaveLocalLogUI:(BOOL)enable {
+#ifdef DevEvn
+    safeMainThreadBlock(^(){
+        ((DWFloatPotViewController *)pot.rootViewController).saveBtn.selected = !enable;
+    });
+#endif
+}
+
 +(BOOL)isShowing {
     BOOL hidden = safeMainThreadGetValue([DWFloatPot sharePot].hidden);
     CGFloat alpha = safeMainThreadGetValue([DWFloatPot sharePot].alpha);

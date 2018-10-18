@@ -275,4 +275,8 @@ static DWLogManager * mgr = nil;
     return _logFilePath;
 }
 
+-(void)setSaveLocalLog:(BOOL)saveLocalLog {
+    _saveLocalLog = saveLocalLog;
+    [DWFloatPot enableSaveLocalLogUI:saveLocalLog];
+}
 @end

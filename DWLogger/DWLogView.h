@@ -95,4 +95,8 @@
 ///Indicate whether the pot is showing.
 +(BOOL)isShowing;
 
+///设置UI为是否允许保存本地日志
+///Config UI to indicate whether enable save local log.
++(void)enableSaveLocalLogUI:(BOOL)enable;
+
 @end
