@@ -12,7 +12,7 @@
  提供日志管理的核心功能
  */
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 /**
  日志过滤器
@@ -61,6 +61,8 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
     ///全局模式
     DWLoggerAll = DWLoggerNormal | DWLoggerInfo | DWLoggerWarning | DWLoggerError,
 };
+
+UIKIT_EXTERN NSNotificationName const DWLoggerDeviceShakeNotification;
 
 @class DWLogView;
 @class DWTableViewHelperModel;
@@ -120,6 +122,10 @@ typedef NS_OPTIONS(NSUInteger, DWLoggerFilter) {
 ///设置日志视图（无需调用）
 ///Config logView for logManager.（Actually you needn't call it）
 +(void)setupLogView:(DWLogView *)logView;
+
+///设置是否允许摇晃控制浮窗的显隐（默认允许）
+///Config whether is able to shake to control float pot.Support by default
++(void)enableShakeToSwitchPot:(BOOL)enable;
 
 ///清除当前日志
 ///Clear current logs on screen.

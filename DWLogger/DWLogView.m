@@ -142,6 +142,35 @@ static DWFloatPot * pot = nil;
 #endif
 }
 
++(void)showPot {
+#ifdef DevEvn
+    safeMainThreadBlock(^(){
+        [DWFloatPot sharePot].hidden = NO;
+        [UIView animateWithDuration:0.4 animations:^{
+            [DWFloatPot sharePot].alpha = 1;
+        }];
+    });
+#endif
+}
+
++(void)hidePot {
+#ifdef DevEvn
+    safeMainThreadBlock(^(){
+        [UIView animateWithDuration:0.4 animations:^{
+            [DWFloatPot sharePot].alpha = 0;
+        } completion:^(BOOL finished) {
+            [DWFloatPot sharePot].hidden = YES;
+        }];
+    });
+#endif
+}
+
++(BOOL)isShowing {
+    BOOL hidden = safeMainThreadGetValue([DWFloatPot sharePot].hidden);
+    CGFloat alpha = safeMainThreadGetValue([DWFloatPot sharePot].alpha);
+    return !hidden && alpha;
+}
+
 #pragma mark --- singleton ---
 +(instancetype)allocWithZone:(struct _NSZone *)zone {
 #ifndef DevEvn
@@ -549,6 +578,14 @@ static DWLogView * loggerView = nil;
     });
 }
 
++(void)showPot {
+    [DWFloatPot showPot];
+}
+
++(void)hidePot {
+    [DWFloatPot hidePot];
+}
+
 +(void)showLogView {
     safeMainThreadBlock(^(){
         [DWLogView shareLogView].hidden = NO;
@@ -815,12 +852,24 @@ static DWLogView * loggerView = nil;
 -(void)panBtnAction:(UIPanGestureRecognizer *)sender
 {
     CGPoint p = [sender locationInView:self.view];
-    if (p.x > BtnLength / 2.0 && p.y > BtnLength / 2.0 && self.width - p.x > BtnLength / 2.0 && self.height - p.y > BtnLength / 2.0) {
-        self.switchBtn.center = p;
-        self.containerView.center = p;
-        if (sender.state == UIGestureRecognizerStateEnded) {
-            [self gotoSideAnimationFromPoint:p];
-        }
+    
+    ///矫正点至边框内
+    if (p.x < BtnLength / 2.0) {
+        p.x = BtnLength / 2.0;
+    } else if (p.x > self.width - BtnLength / 2.0) {
+        p.x = self.width - BtnLength / 2.0;
+    }
+    
+    if (p.y < BtnLength / 2.0) {
+        p.y = BtnLength / 2.0;
+    } else if (p.y > self.height - BtnLength / 2.0) {
+        p.y = self.height - BtnLength / 2.0;
+    }
+    
+    self.switchBtn.center = p;
+    self.containerView.center = p;
+    if (sender.state == UIGestureRecognizerStateEnded) {
+        [self gotoSideAnimationFromPoint:p];
     }
 }
 

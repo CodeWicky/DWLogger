@@ -39,6 +39,14 @@
 ///Disable logview interaction.
 +(void)disableUserInteraction;
 
+///展示浮窗
+///Show float pot.
++(void)showPot;
+
+///隐藏浮窗
+///Hide float pot.
++(void)hidePot;
+
 ///展示日志视图
 ///Show LogView.
 +(void)showLogView;
@@ -82,5 +90,9 @@
 ///单例方法
 ///Singleton.
 +(instancetype)sharePot;
+
+///是否正在展示
+///Indicate whether the pot is showing.
++(BOOL)isShowing;
 
 @end

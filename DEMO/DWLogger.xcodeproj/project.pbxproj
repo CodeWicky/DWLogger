@@ -23,6 +23,7 @@
 		9B2FA0DD1F7A276100AAC6CF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0DC1F7A276100AAC6CF /* main.m */; };
 		9B2FA0E71F7A276100AAC6CF /* DWLoggerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0E61F7A276100AAC6CF /* DWLoggerTests.m */; };
 		9B2FA0F21F7A276100AAC6CF /* DWLoggerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2FA0F11F7A276100AAC6CF /* DWLoggerUITests.m */; };
+		9B7B14D121786CCD00705D5C /* UIWindow+DWLoggerShake.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7B14D021786CCD00705D5C /* UIWindow+DWLoggerShake.m */; };
 		9BDFE5D21F90DEC300650A25 /* DWCrashCollector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BDFE5CB1F90DEC200650A25 /* DWCrashCollector.m */; };
 /* End PBXBuildFile section */
 
@@ -75,6 +76,9 @@
 		9B2FA0ED1F7A276100AAC6CF /* DWLoggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DWLoggerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B2FA0F11F7A276100AAC6CF /* DWLoggerUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWLoggerUITests.m; sourceTree = "<group>"; };
 		9B2FA0F31F7A276100AAC6CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9B7B14CF21786CCD00705D5C /* UIWindow+DWLoggerShake.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIWindow+DWLoggerShake.h"; sourceTree = "<group>"; };
+		9B7B14D021786CCD00705D5C /* UIWindow+DWLoggerShake.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+DWLoggerShake.m"; sourceTree = "<group>"; };
+		9B7B14D221786FF500705D5C /* DWLoggerMacro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWLoggerMacro.h; sourceTree = "<group>"; };
 		9BDFE5CA1F90DEC200650A25 /* DWCrashCollector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWCrashCollector.h; sourceTree = "<group>"; };
 		9BDFE5CB1F90DEC200650A25 /* DWCrashCollector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWCrashCollector.m; sourceTree = "<group>"; };
 		A3FBA6F16FD830C8B5CEC6C2 /* libPods-DWLogger.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DWLogger.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,6 +130,9 @@
 				9B1592F11F83D3F3003ECA7E /* DWLogManager.m */,
 				9B1592F21F83D3F3003ECA7E /* DWLogView.h */,
 				9B1592F31F83D3F3003ECA7E /* DWLogView.m */,
+				9B7B14CF21786CCD00705D5C /* UIWindow+DWLoggerShake.h */,
+				9B7B14D021786CCD00705D5C /* UIWindow+DWLoggerShake.m */,
+				9B7B14D221786FF500705D5C /* DWLoggerMacro.h */,
 			);
 			name = DWLogger;
 			path = ../../DWLogger;
@@ -407,6 +414,7 @@
 				9B2FA0CF1F7A276100AAC6CF /* AppDelegate.m in Sources */,
 				9B1592FE1F83D3F3003ECA7E /* DWLogManager.m in Sources */,
 				9B1592FF1F83D3F3003ECA7E /* DWLogView.m in Sources */,
+				9B7B14D121786CCD00705D5C /* UIWindow+DWLoggerShake.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

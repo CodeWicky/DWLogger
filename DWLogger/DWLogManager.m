@@ -12,6 +12,9 @@
 #import "DWFileManager.h"
 #import "UIDevice+DWDeviceUtils.h"
 #import "DWCrashCollector.h"
+#import "UIWindow+DWLoggerShake.h"
+
+NSNotificationName const DWLoggerDeviceShakeNotification = @"DWLoggerDeviceShakeNotification";
 
 #define FilePath [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:@"DWLogger"]
 
@@ -29,6 +32,8 @@ static DWLogManager * mgr = nil;
 @property (nonatomic ,strong) dispatch_queue_t writeFileQueue;
 
 @property (nonatomic ,strong) dispatch_queue_t updateLogQueue;
+
+@property (nonatomic ,assign) BOOL enableShakeControl;
 
 @end
 
@@ -49,6 +54,7 @@ static DWLogManager * mgr = nil;
         NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
         [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSSSSS"];
         [mgr configFormatter:formatter];
+        [[NSNotificationCenter defaultCenter] addObserver:mgr selector:@selector(receiveShakeNotification:) name:DWLoggerDeviceShakeNotification object:nil];
     });
     return mgr;
 #endif
@@ -113,6 +119,10 @@ static DWLogManager * mgr = nil;
     }
 }
 
++(void)enableShakeToSwitchPot:(BOOL)enable {
+    [DWLogManager shareLogManager].enableShakeControl = enable;
+}
+
 +(void)removeAllLogBackUp {
     [DWFileManager dw_ClearDirectoryAtPath:[DWLogManager shareLogManager].filePath];
 }
@@ -137,6 +147,8 @@ static DWLogManager * mgr = nil;
 
 +(void)configDefaultLogger {
     [DWLogManager configLoggerWithFilter:DWLoggerAll needLogView:YES];
+    [DWFloatPot sharePot].alpha = 0;
+    [DWLogManager enableShakeToSwitchPot:YES];
 }
 
 +(void)configLoggerWithFilter:(DWLoggerFilter)filter needLogView:(BOOL)need {
@@ -184,6 +196,16 @@ static DWLogManager * mgr = nil;
     _timeFormatter = formatter;
 }
 
+-(void)receiveShakeNotification:(NSNotification *)notice {
+    if (self.enableShakeControl) {
+        if ([DWFloatPot isShowing]) {
+            [DWLogView hidePot];
+        } else {
+            [DWLogView showPot];
+        }
+    }
+}
+
 #pragma mark --- singleton ---
 
 +(instancetype)allocWithZone:(struct _NSZone *)zone {
@@ -204,6 +226,11 @@ static DWLogManager * mgr = nil;
 
 -(id)mutableCopyWithZone:(struct _NSZone *)zone {
     return self;
+}
+
+#pragma mark --- override ---
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark --- setter/getter ---

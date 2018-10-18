@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 #import "DWLogger.h"
-#import "DWSearchView.h"
+#import "DWLogView.h"
 
 
 @interface ViewController ()
@@ -72,6 +72,7 @@
 //    [@[] objectAtIndex:1];//此句可导致异常崩溃
     
 //    DWLog(@"111");
+    
     static int i = 0;
     i++;
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
