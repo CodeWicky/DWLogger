@@ -97,7 +97,7 @@ static DWLogManager * mgr = nil;
             logger.updateLogQueue = dispatch_queue_create("com.updateLogQueue.DWLogManager", DISPATCH_QUEUE_SERIAL);
         });
         dispatch_sync(logger.updateLogQueue, ^{
-            [[DWLogView loggerContainer] addObject:model];
+            [[DWLogManager shareLogManager].logArr addObject:model];
         });
         if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
             [DWLogView updateLog:model filter:filter];
@@ -141,7 +141,7 @@ static DWLogManager * mgr = nil;
 
 +(void)clearCurrentLog {
     if ([DWLogManager shareLogManager].logView) {
-        [[DWLogView loggerContainer] removeAllObjects];
+        [DWLogView clearCurrentLog];
     }
 }
 

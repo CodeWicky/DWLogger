@@ -63,6 +63,10 @@
 ///Return array of all logs.（Actually you needn't call it）
 +(NSMutableArray *)loggerContainer;
 
+///清除当前日志
+///Clear current logs on screen.
++(void)clearCurrentLog;
+
 ///更新日志（无需调用）
 ///Update log on screen.（Actually you needn't call it）
 +(void)updateLog:(DWLogModel *)logModel filter:(DWLoggerFilter)filter;

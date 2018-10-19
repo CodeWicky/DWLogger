@@ -629,6 +629,22 @@ static DWLogView * loggerView = nil;
     return  vc.dataArr;
 }
 
++(void)clearCurrentLog {
+    ///清楚日志并清除相关标志位
+    /*
+     1.清除屏幕日志
+     2.清除搜索结果
+     3.清除过滤数据源
+     4.刷新列表
+     */
+    DWLogViewController * vc = (DWLogViewController *)safeMainThreadGetValue([DWLogView shareLogView].rootViewController);
+    [vc.dataArr removeAllObjects];
+    vc.loadedCount = 0;
+    [vc clearSearchResultWithResetSearchView:YES];
+    [vc.filterLogArray removeAllObjects];
+    [vc.helper reloadDataWithCompletion:nil];
+}
+
 +(void)updateLog:(DWLogModel *)logModel filter:(DWLoggerFilter)filter {
     ///更新日志操作
     /*
@@ -958,18 +974,7 @@ static DWLogView * loggerView = nil;
 
 -(void)clearBtnAction:(UIButton *)sender
 {
-    ///清楚日志并清除相关标志位
-    /*
-     1.清除屏幕日志
-     2.清除搜索结果
-     3.清除过滤数据源
-     4.刷新列表
-     */
-    [DWLogManager clearCurrentLog];
-    DWLogViewController * vc = (DWLogViewController *)safeMainThreadGetValue([DWLogView shareLogView].rootViewController);
-    [vc clearSearchResultWithResetSearchView:YES];
-    [vc.filterLogArray removeAllObjects];
-    [vc.helper reloadDataWithCompletion:nil];
+    [DWLogView clearCurrentLog];
 }
 
 -(void)modeBtnAction:(UIButton *)sender
