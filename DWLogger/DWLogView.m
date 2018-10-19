@@ -102,6 +102,8 @@ dispatch_sync(dispatch_get_main_queue(), a);\
 
 @property (nonatomic ,strong) DWSearchView * searchView;
 
+@property (nonatomic ,strong) UIView * searchContainer;
+
 @property (nonatomic ,strong) NSMutableArray * searchIndexArray;
 
 @property (nonatomic ,assign) BOOL searchMode;
@@ -307,7 +309,13 @@ static DWFloatPot * pot = nil;
 #pragma mark --- life ---
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.view addSubview:self.searchView];
+    [self.view addSubview:self.searchContainer];
+    CGFloat statusH = [UIApplication sharedApplication].statusBarFrame.size.height;
+    CGPoint ori = CGPointMake(0, statusH > 20 ? statusH : 0);
+    CGRect frm = self.searchView.frame;
+    frm.origin = ori;
+    self.searchView.frame = frm;
+    [self.searchContainer addSubview:self.searchView];
     [self.view addSubview:self.mainTab];
     if ([UIScrollView instancesRespondToSelector:NSSelectorFromString(@"setContentInsetAdjustmentBehavior:")]) {
 #pragma clang diagnostic push
@@ -484,7 +492,10 @@ static DWFloatPot * pot = nil;
     [self.helper reloadDataWithCompletion:^{
         ///根据搜索结果数区分三种状态
         if (result.count == 0) {///非搜索模式或无搜索结果
-            safeMainThreadCode([self.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES]);
+            ///如果当前有数据则滚动至列表底部，否则不滚动
+            if (count > 0) {
+                safeMainThreadCode([self.mainTab scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES]);
+            }
         } else if (result.count == 1) {///为搜索模式且搜索结果仅有一个
             [self changeSearchIndex:0];
         } else {///为搜索模式且当前存在高亮状态
@@ -506,7 +517,7 @@ static DWFloatPot * pot = nil;
 }
 
 -(void)logPoolTimerAction:(NSTimer *)timer {
-    if (self.needLogPoolReloadTab || self.loadedCount != self.helper.dataSource.count) {
+    if ((self.needLogPoolReloadTab || self.loadedCount != self.helper.dataSource.count) && [DWLogView shareLogView].isShowing) {
         self.needLogPoolReloadTab = NO;
         self.loadedCount = self.helper.dataSource.count;
         [self reloadTabWithChangeMode:NO completion:nil];
@@ -524,14 +535,14 @@ static DWFloatPot * pot = nil;
 #pragma mark --- setter/getter ---
 -(UITableView *)mainTab {
     if (!_mainTab) {
-        _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, self.searchView.bounds.size.height, self.view.bounds.size.width, self.view.bounds.size.height - self.searchView.bounds.size.height) style:UITableViewStylePlain];
+        CGFloat oriY = self.searchContainer.frame.size.height;
+        _mainTab = [[UITableView alloc] initWithFrame:CGRectMake(0, oriY, self.view.bounds.size.width, self.view.bounds.size.height - oriY) style:UITableViewStylePlain];
         self.helper = [[DWTableViewHelper alloc] initWithTabV:_mainTab dataSource:self.dataArr];
         self.helper.useAutoRowHeight = YES;
         _mainTab.estimatedRowHeight = 0;
         _mainTab.scrollsToTop = NO;
         _mainTab.backgroundColor = [UIColor clearColor];
-        _mainTab.showsVerticalScrollIndicator = NO;
-        _mainTab.showsHorizontalScrollIndicator = NO;
+        _mainTab.indicatorStyle = UIScrollViewIndicatorStyleWhite;
         _mainTab.separatorStyle = UITableViewCellSeparatorStyleNone;
     }
     return _mainTab;
@@ -559,6 +570,15 @@ static DWFloatPot * pot = nil;
         };
     }
     return _searchView;
+}
+
+-(UIView *)searchContainer {
+    if (!_searchContainer) {
+        CGFloat statusH = [UIApplication sharedApplication].statusBarFrame.size.height;
+        _searchContainer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.searchView.bounds.size.width, self.searchView.bounds.size.height + (statusH > 20 ? statusH : 0))];
+        _searchContainer.backgroundColor = self.searchView.backgroundColor;
+    }
+    return _searchContainer;
 }
 
 @end

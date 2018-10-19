@@ -99,6 +99,11 @@
  version 1.0.7.4
  fixBug:修复手动设置不收集日志时内部按钮图标为改变的bug
  
+ version 1.0.8
+ fixBug:修复缓冲池在sx清空日志后引起崩溃的问题
+ 适配iPx等具备刘海的机型
+ 修改缓冲池刷新机制，若不在显示范围内不刷新
+ 
  */
 
 #ifndef DWLogger_h
