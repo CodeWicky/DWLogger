@@ -299,6 +299,17 @@ static DWFloatPot * pot = nil;
 }
 
 -(void)tapAction:(UITapGestureRecognizer *)sender {
+    ///背景色动画
+    CABasicAnimation * bgC = [CABasicAnimation animationWithKeyPath:@"backgroundColor"];
+    bgC.fromValue = (id)self.contentView.backgroundColor.CGColor;
+    bgC.toValue = (id)[UIColor whiteColor].CGColor;
+    bgC.duration = 0.2;
+    bgC.timingFunction = [CAMediaTimingFunction functionWithName:kCAAnimationLinear];
+    bgC.fillMode = kCAFillModeForwards;
+    bgC.removedOnCompletion = YES;
+    bgC.autoreverses = YES;
+    [self.contentView.layer addAnimation:bgC forKey:@"ani"];
+    
     [UIPasteboard generalPasteboard].string = ((DWLogModel *)self.model).absoluteLog;
 }
 
@@ -435,7 +446,6 @@ static DWFloatPot * pot = nil;
      */
     if (self.highlightIndex < self.helper.dataSource.count) {
         DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.highlightIndex inSection:0]];
-        
         self.highligthModel.highlighted = NO;
         [cell setBackgroundHighlight:NO];
     }
