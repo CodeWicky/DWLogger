@@ -289,6 +289,15 @@ static DWFloatPot * pot = nil;
     [self.contentView addConstraint:rightConstraint];
     [self.contentView addConstraint:upConstraint];
     [self.contentView addConstraint:downConstraint];
+    
+    self.logLb.userInteractionEnabled = YES;
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+    tap.numberOfTapsRequired = 2;
+    [self.logLb addGestureRecognizer:tap];
+}
+
+-(void)tapAction:(UITapGestureRecognizer *)sender {
+    [UIPasteboard generalPasteboard].string = ((DWLogModel *)self.model).absoluteLog;
 }
 
 #pragma mark --- override ---
