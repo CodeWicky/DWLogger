@@ -110,6 +110,8 @@ dispatch_sync(dispatch_get_main_queue(), a);\
 
 @property (nonatomic ,assign) NSInteger highlightIndex;
 
+@property (nonatomic ,strong) DWLogModel * highligthModel;
+
 @property (nonatomic ,assign) BOOL needModeChangeReloadTab;
 
 @property (nonatomic ,assign) BOOL needDataSourceChangeReloadTab;
@@ -406,6 +408,7 @@ static DWFloatPot * pot = nil;
                 safeMainThreadCode([self.mainTab scrollToRowAtIndexPath:idxP atScrollPosition:UITableViewScrollPositionMiddle animated:YES]);
                 ///记录当前位置
                 self.highlightIndex = idx;
+                self.highligthModel = [self.helper modelFromIndexPath:idxP];
             }
         }
     }
@@ -423,11 +426,12 @@ static DWFloatPot * pot = nil;
      */
     if (self.highlightIndex < self.helper.dataSource.count) {
         DWlogCell * cell = [self.mainTab cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.highlightIndex inSection:0]];
-        DWLogModel * m = cell.model;
-        m.highlighted = NO;
+        
+        self.highligthModel.highlighted = NO;
         [cell setBackgroundHighlight:NO];
     }
     self.highlightIndex = -1;
+    self.highligthModel = nil;
     self.searchIndexArray = nil;
     if (reset) {
         [self.searchView reset];
