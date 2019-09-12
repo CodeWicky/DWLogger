@@ -91,6 +91,23 @@
  version 1.1.7
  添加头视图自动放大
  cell添加计算行高标志位
+ 
+ version 1.1.7.1
+ model添加重新自动计算高度接口
+ helper添加设置所有model均需重新计算接口
+ 
+ version 1.1.7.2
+ 当无指定行高时，添加使用tableView.rowHeight逻辑
+ 
+ version 1.1.7.3
+ 添加外部自行实现cellForRow代理后，取重用cell的方法及处理LoadDataMode的方法
+ 
+ version 1.1.7.4
+ 移除LoadDataMode方法，内部自动调用，开发者无需处理
+
+ version 1.1.7.5
+ 修复reload前判断是否存在数据引起的处理错误
+
  */
 
 #import <UIKit/UIKit.h>
@@ -352,6 +369,9 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
 ///取出对应indexPath对应的数据模型（具有容错机制）
 -(__kindof DWTableViewHelperModel *)modelFromIndexPath:(NSIndexPath *)indexPath;
 
+///根据重用id及indexPath取出重用的cell（外界重写cellForRow代理时调用，可根据模型动态生成cell）
+-(__kindof DWTableViewHelperCell *)dequeueReusableCellWithModel:(__kindof DWTableViewHelperModel *)model;
+
 ///让分割线归零
 -(void)setTheSeperatorToZero;
 
@@ -398,7 +418,6 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
 ///修复iOS11后refreshControl位置错误
 -(void)fixRefreshControlInsets;
 
-
 /**
  设置自动放大的头视图，与tableHeaderView相互冲突
 
@@ -406,6 +425,10 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
  @param handler 当滚动时的触发回调，可在此处处理导航透明度
  */
 -(void)setAutoZoomHeader:(UIView *)header scrollHandler:(void(^)(CGFloat contentoffset))handler;
+
+///设置当前所有模型均为需要重新自动计算高度
+-(void)setAllNeedsReAutoCalculateRowHeight;
+
 @end
 
 #pragma mark --- DWTableViewHelperModel 数据模型基类 ---
@@ -428,6 +451,9 @@ typedef NS_ENUM(NSUInteger, DWTableViewHelperLoadDataMode) {///数据加载优�
 
 ///配合DWTableViewHelperLoadDataIgnoreHighSpeedMode使用，标志cell是否被绘制过
 @property (nonatomic ,assign ,readonly) BOOL cellHasBeenDrawn;
+
+///设置需要重新自动计算高度
+-(void)setNeedsReAutoCalculateRowHeight;
 
 @end
 

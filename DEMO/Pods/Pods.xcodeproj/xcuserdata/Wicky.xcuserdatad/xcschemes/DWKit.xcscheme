@@ -14,9 +14,9 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CDC83DB77800373F7E3EC5340E61C67B"
-               BuildableName = "libPods-DWLogger.a"
-               BlueprintName = "Pods-DWLogger"
+               BlueprintIdentifier = "0C701BBEE5D869E57EF5A4A9353C2A29"
+               BuildableName = "libDWKit.a"
+               BlueprintName = "DWKit"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

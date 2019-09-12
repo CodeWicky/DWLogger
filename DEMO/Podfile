@@ -1,4 +1,3 @@
 target 'DWLogger' do
-pod 'DWCheckBox', '~> 1.0.3'
-pod 'DWTableViewHelper', '~> 1.1.5'
+pod 'DWLogger' ,:path => '../'
 end

@@ -1,15 +1,47 @@
 PODS:
-  - DWCheckBox (1.0.3)
-  - DWTableViewHelper (1.1.7)
+  - DWCheckBox (1.1.1)
+  - DWKit/DWUtils/DWOperationCancelFlag (0.0.0.4)
+  - DWLogger (1.0.8.3):
+    - DWCheckBox
+    - DWLogger/Dependence (= 1.0.8.3)
+    - DWTableViewHelper
+  - DWLogger/Dependence (1.0.8.3):
+    - DWCheckBox
+    - DWLogger/Dependence/DWArrayUtils (= 1.0.8.3)
+    - DWLogger/Dependence/DWDeviceUtils (= 1.0.8.3)
+    - DWLogger/Dependence/DWFileManager (= 1.0.8.3)
+    - DWTableViewHelper
+  - DWLogger/Dependence/DWArrayUtils (1.0.8.3):
+    - DWCheckBox
+    - DWTableViewHelper
+  - DWLogger/Dependence/DWDeviceUtils (1.0.8.3):
+    - DWCheckBox
+    - DWTableViewHelper
+  - DWLogger/Dependence/DWFileManager (1.0.8.3):
+    - DWCheckBox
+    - DWTableViewHelper
+  - DWTableViewHelper (1.1.7.5.1):
+    - DWKit/DWUtils/DWOperationCancelFlag
 
 DEPENDENCIES:
-  - DWCheckBox (~> 1.0.3)
-  - DWTableViewHelper (~> 1.1.5)
+  - DWLogger (from `../`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - DWCheckBox
+    - DWKit
+    - DWTableViewHelper
+
+EXTERNAL SOURCES:
+  DWLogger:
+    :path: "../"
 
 SPEC CHECKSUMS:
-  DWCheckBox: 566e20f6097a1013dc159ed0b619b3d2fff07468
-  DWTableViewHelper: cb078fee1196dff8b0972f25069cb8411922475b
+  DWCheckBox: 349e0671fdb7291cc5b0aa1554ca9084a8fd48d9
+  DWKit: d7c2414cee5b1a262083c3a8254f79cfa5707941
+  DWLogger: 19f475aa40456c99307543b96c54cc222d539f2c
+  DWTableViewHelper: 38ed900d37b889ce46770b33d43847be4597206d
 
-PODFILE CHECKSUM: 6b19ab5080f144b9f7cfabca097164671fb9eafc
+PODFILE CHECKSUM: fb57397cde8257bbb934fa8067fd369a6f97ec28
 
-COCOAPODS: 1.4.0.beta.2
+COCOAPODS: 1.7.2

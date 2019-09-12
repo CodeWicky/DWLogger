@@ -174,16 +174,36 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     return obj;
 }
 
+-(DWTableViewHelperCell *)dequeueReusableCellWithModel:(__kindof DWTableViewHelperModel *)model {
+    if (!model) {
+        return nil;
+    }
+    return [self createCellFromModel:model useReuse:YES];
+}
+
+-(void)handleLoadDataWithCell:(__kindof DWTableViewHelperCell *)cell indexPath:(NSIndexPath *)indexPath model:(__kindof DWTableViewHelperModel *)model {
+    if (!cell || !indexPath || !model) {
+        return;
+    }
+    if (self.loadDataMode == DWTableViewHelperLoadDataIgnoreHighSpeedMode || self.loadDataMode == DWTableViewHelperLoadDataIgnoreHighSpeedWithSnapMode) {
+        [self ignoreModeLoadCell:cell indexPath:indexPath model:model];
+    } else if (self.loadDataMode == DWTableViewHelperLoadDataLazyMode) {
+        [self lazyModeLoadCell:cell indexPath:indexPath model:model];
+    } else {
+        cell.model = model;
+    }
+}
+
 -(void)setTheSeperatorToZero {
     [self.tabV setSeparatorInset:UIEdgeInsetsZero];
 }
 
 -(void)reloadDataAndHandlePlaceHolderView
 {
-    BOOL haveData = [self caculateHaveData];
     __weak typeof(self)weakSelf = self;
     [self reloadDataWithCompletion:^{
-        handlePlaceHolderView(weakSelf.placeHolderView, weakSelf.tabV, !haveData, &hasPlaceHolderView);
+        ///修复reload前判断是否存在数据引起的处理错误
+        handlePlaceHolderView(weakSelf.placeHolderView, weakSelf.tabV, ![self caculateHaveData], &hasPlaceHolderView);
     }];
 }
 
@@ -384,6 +404,22 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     }
 }
 
+-(void)setAllNeedsReAutoCalculateRowHeight {
+    [self.dataSource enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [self setObjNeedsReAutoCalculateRowHeight:obj];
+    }];
+}
+
+-(void)setObjNeedsReAutoCalculateRowHeight:(id)anObj {
+    if ([anObj isKindOfClass:[NSArray class]]) {
+        [((NSArray *)anObj) enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [self setObjNeedsReAutoCalculateRowHeight:obj];
+        }];
+    } else if ([anObj isKindOfClass:[DWTableViewHelperModel class]]) {
+        [((__kindof DWTableViewHelperModel *)anObj) setNeedsReAutoCalculateRowHeight];
+    }
+}
+
 #pragma mark --- delegate Map Start ---
 ///display
 -(void)tableView:(UITableView *)tableView willDisplayCell:(DWTableViewHelperCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -443,6 +479,9 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     }
     if (self.useAutoRowHeight) {//返回放回自动计算的行高
         return [self autoCalculateRowHeightWithModel:model];
+    }
+    if (self.tabV.rowHeight >= 0) {
+        return self.tabV.rowHeight;
     }
     return 44;
 }
@@ -721,13 +760,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     } else {
         cell = [self createCellFromModel:model useReuse:YES];
     }
-    if (self.loadDataMode == DWTableViewHelperLoadDataIgnoreHighSpeedMode || self.loadDataMode == DWTableViewHelperLoadDataIgnoreHighSpeedWithSnapMode) {
-        [self ignoreModeLoadCell:cell indexPath:indexPath model:model];
-    } else if (self.loadDataMode == DWTableViewHelperLoadDataLazyMode) {
-        [self lazyModeLoadCell:cell indexPath:indexPath model:model];
-    } else {
-        cell.model = model;
-    }
+    [self handleLoadDataWithCell:cell indexPath:indexPath model:model];
     return cell;
 }
 
@@ -1478,7 +1511,6 @@ static inline DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashingGetter (
         PlaceHolderCellModelAvoidCrashing.cellRowHeight = 0;
         PlaceHolderCellModelAvoidCrashing.cellClassStr = NSStringFromClass([DWTableViewHelperCell class]);
         PlaceHolderCellModelAvoidCrashing.cellID = @"PlaceHolderCellAvoidCrashing";
-        
     }
     return PlaceHolderCellModelAvoidCrashing;
 }
@@ -1504,8 +1536,7 @@ static inline DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashingGetter (
 @synthesize cellClassStr,cellID,cellRowHeight,cellEditSelectedIcon,cellEditUnselectedIcon;
 
 -(instancetype)init{
-    self = [super init];
-    if (self) {
+    if (self = [super init]) {
         self.cellRowHeight = -1;
         if (!ImageNull) {
             ImageNull = [UIImage new];
@@ -1544,6 +1575,11 @@ static inline DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashingGetter (
     } else {
         self.calRowHeightH = autoCalRowHeight;
     }
+}
+
+-(void)setNeedsReAutoCalculateRowHeight {
+    self.calRowHeightH = -1;
+    self.calRowHeightV = -1;
 }
 
 @end
