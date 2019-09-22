@@ -27,31 +27,15 @@
     ],
     "DWCheckBox": [
 
+    ],
+    "DWKit/DWCategory/DWArrayUtils": [
+
+    ],
+    "DWKit/DWCategory/DWDeviceUtils": [
+
+    ],
+    "DWKit/DWUtils/DWFileManager": [
+
     ]
-  },
-  "subspecs": [
-    {
-      "name": "Dependence",
-      "subspecs": [
-        {
-          "name": "DWFileManager",
-          "source_files": "DWLogger/**/DWFileManager.{h,m}",
-          "public_header_files": "DWLogger/**/DWFileManager.h",
-          "frameworks": "UIKit"
-        },
-        {
-          "name": "DWArrayUtils",
-          "source_files": "DWLogger/**/NSArray+DWArrayUtils.{h,m}",
-          "public_header_files": "DWLogger/**/NSArray+DWArrayUtils.h",
-          "frameworks": "UIKit"
-        },
-        {
-          "name": "DWDeviceUtils",
-          "source_files": "DWLogger/**/UIDevice+DWDeviceUtils.{h,m}",
-          "public_header_files": "DWLogger/**/UIDevice+DWDeviceUtils.h",
-          "frameworks": "UIKit"
-        }
-      ]
-    }
-  ]
+  }
 }

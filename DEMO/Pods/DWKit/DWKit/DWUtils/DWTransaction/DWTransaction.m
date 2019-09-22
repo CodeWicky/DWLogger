@@ -19,7 +19,15 @@
 
 @property (nonatomic ,strong) DWTransaction * cycleSelf;
 
+#pragma mark --- Wait ---
 @property (nonatomic ,strong) NSBlockOperation * op;
+
+#pragma mark --- MissionComlpetion ---
+@property (atomic ,assign) int missionCount;
+
+@property (nonatomic ,strong) NSMutableArray <dispatch_block_t>* completionHandlerContainer;
+
+@property (nonatomic ,strong) dispatch_semaphore_t sema;
 
 @end
 
@@ -55,7 +63,7 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     }];
 }
 
-+(instancetype)dw_TransactionWithCompletion:(dispatch_block_t)completion {
++(instancetype)transactionWithCompletion:(dispatch_block_t)completion {
     if (!completion) {
         return nil;
     }
@@ -72,11 +80,11 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     }
 }
 
-+(instancetype)dw_TransactionWithTarget:(id)target selector:(SEL)selector {
-    return [self dw_TransactionWithTarget:target selector:selector withObject:nil];
++(instancetype)transactionWithTarget:(id)target selector:(SEL)selector {
+    return [self transactionWithTarget:target selector:selector withObject:nil];
 }
 
-+(instancetype)dw_TransactionWithTarget:(id)target selector:(SEL)selector withObject:(id)object {
++(instancetype)transactionWithTarget:(id)target selector:(SEL)selector withObject:(id)object {
     if (!target || !selector) {
         return nil;
     }
@@ -95,7 +103,36 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     [transactionSet addObject:self];
 }
 
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout completion:(dispatch_block_t)completion {
+#pragma mark --- setter/getter ---
+-(NSMutableArray<dispatch_block_t> *)completionHandlerContainer {
+    if (!_completionHandlerContainer) {
+        _completionHandlerContainer = @[].mutableCopy;
+    }
+    return _completionHandlerContainer;
+}
+
+-(dispatch_semaphore_t)sema {
+    if (!_sema) {
+        _sema = dispatch_semaphore_create(1);
+    }
+    return _sema;
+}
+
+#pragma mark --- tool func ---
+static inline void freeTransaction(DWTransaction * trans) {
+    trans.cycleSelf = nil;
+    trans.target = nil;
+    trans.selector = nil;
+    trans.object = nil;
+    trans.completionHandlerContainer = nil;
+    trans.missionCount = 0;
+    trans.sema = nil;
+}
+@end
+
+@implementation DWTransaction (Wait)
+
++(instancetype)waitUtil:(NSTimeInterval)timeout completion:(dispatch_block_t)completion {
     if (!completion) {
         return nil;
     }
@@ -120,15 +157,15 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     self.op = op;
 }
 
-+(instancetype)dw_WaitWithCompletion:(dispatch_block_t)completion {
-    return [self dw_WaitUtil:-1 completion:completion];
++(instancetype)waitWithCompletion:(dispatch_block_t)completion {
+    return [self waitUtil:-1 completion:completion];
 }
 
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector {
-    return [self dw_WaitUtil:timeout target:target selector:selector object:nil];
++(instancetype)waitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector {
+    return [self waitUtil:timeout target:target selector:selector object:nil];
 }
 
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector object:(id)object {
++(instancetype)waitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector object:(id)object {
     if (!target || !selector) {
         return nil;
     }
@@ -138,19 +175,19 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
         [target performSelector:selector withObject:object];
 #pragma clang diagnostic pop
     };
-    DWTransaction * transaction = [DWTransaction dw_WaitUtil:timeout completion:ab];
+    DWTransaction * transaction = [DWTransaction waitUtil:timeout completion:ab];
     transaction.target = target;
     transaction.selector = selector;
     transaction.object = object;
     return transaction;
 }
 
-+(instancetype)dw_WaitWithTarget:(id)target selector:(SEL)selector {
-    return [self dw_WaitUtil:-1 target:target selector:selector];
++(instancetype)waitWithTarget:(id)target selector:(SEL)selector {
+    return [self waitUtil:-1 target:target selector:selector];
 }
 
-+(instancetype)dw_WaitWithTarget:(id)target selector:(SEL)selector object:(id)object {
-    return [self dw_WaitUtil:-1 target:target selector:selector object:object];
++(instancetype)waitWithTarget:(id)target selector:(SEL)selector object:(id)object {
+    return [self waitUtil:-1 target:target selector:selector object:object];
 }
 
 -(void)run {
@@ -178,10 +215,49 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     freeTransaction(self);
 }
 
-static inline void freeTransaction(DWTransaction * trans) {
-    trans.cycleSelf = nil;
-    trans.target = nil;
-    trans.selector = nil;
-    trans.object = nil;
+@end
+
+@implementation DWTransaction (MissionComlpetion)
+
++(instancetype)configWithMissionCompletionHandler:(dispatch_block_t)completion {
+    DWTransaction * t = [DWTransaction new];
+    if (completion) {
+        [t.completionHandlerContainer addObject:completion];
+    }
+    return t;
 }
+
+-(void)addMissionCompletionHandler:(dispatch_block_t)completion {
+    if (!completion) {
+        return;
+    }
+    dispatch_semaphore_wait(self.sema, DISPATCH_TIME_FOREVER);
+    [self.completionHandlerContainer addObject:completion];
+    dispatch_semaphore_signal(self.sema);
+}
+
+-(void)startAnMission {
+    if (!self.cycleSelf) {
+        self.cycleSelf = self;
+    }
+    self.missionCount ++;
+}
+
+-(void)finishAnMission {
+    self.missionCount --;
+    if (self.missionCount == 0) {
+        [self callCompletionHandler];
+    }
+}
+
+-(void)callCompletionHandler {
+    dispatch_semaphore_wait(self.sema, DISPATCH_TIME_FOREVER);
+    [self.completionHandlerContainer enumerateObjectsUsingBlock:^(dispatch_block_t  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        obj();
+    }];
+    [self.completionHandlerContainer removeAllObjects];
+    dispatch_semaphore_signal(self.sema);
+    freeTransaction(self);
+}
+
 @end

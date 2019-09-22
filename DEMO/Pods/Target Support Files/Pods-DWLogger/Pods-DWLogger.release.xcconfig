@@ -1,7 +1,7 @@
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
 HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/DWCheckBox" "${PODS_ROOT}/Headers/Public/DWKit" "${PODS_ROOT}/Headers/Public/DWLogger" "${PODS_ROOT}/Headers/Public/DWTableViewHelper"
 LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/DWCheckBox" "${PODS_CONFIGURATION_BUILD_DIR}/DWKit" "${PODS_CONFIGURATION_BUILD_DIR}/DWLogger" "${PODS_CONFIGURATION_BUILD_DIR}/DWTableViewHelper"
-OTHER_LDFLAGS = $(inherited) -ObjC -l"DWCheckBox" -l"DWKit" -l"DWLogger" -l"DWTableViewHelper" -framework "UIKit"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"DWCheckBox" -l"DWKit" -l"DWLogger" -l"DWTableViewHelper" -framework "Security" -framework "UIKit"
 PODS_BUILD_DIR = ${BUILD_DIR}
 PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
 PODS_PODFILE_DIR_PATH = ${SRCROOT}/.

@@ -7,10 +7,10 @@
 //
 
 #import "DWLogManager.h"
+#import <DWKit/DWFileManager.h>
+#import <DWKit/UIDevice+DWDeviceUtils.h>
 #import "DWLogger.h"
 #import "DWLogView.h"
-#import "DWFileManager.h"
-#import "UIDevice+DWDeviceUtils.h"
 #import "DWCrashCollector.h"
 #import "UIWindow+DWLoggerShake.h"
 
@@ -109,9 +109,9 @@ static DWLogManager * mgr = nil;
             if (!logger.writeFileQueue) {
                 logger.writeFileQueue = dispatch_queue_create("com.writeFileQueue.DWLogManager", DISPATCH_QUEUE_SERIAL);
             }
-            if (![DWFileManager dw_IsFileAtPath:logger.logFilePath]) {
+            if (![DWFileManager isFileAtPath:logger.logFilePath]) {
                 dispatch_async(logger.writeFileQueue, ^{
-                    [DWFileManager dw_CreateFileAtPath:logger.logFilePath];
+                    [DWFileManager createFileAtPath:logger.logFilePath];
                 });
             }
         });
@@ -124,15 +124,15 @@ static DWLogManager * mgr = nil;
 }
 
 +(void)removeAllLogBackUp {
-    [DWFileManager dw_ClearDirectoryAtPath:[DWLogManager shareLogManager].filePath];
+    [DWFileManager clearDirectoryAtPath:[DWLogManager shareLogManager].filePath];
 }
 
 +(void)removeAllCrashBackUp {
-    [DWFileManager dw_ClearDirectoryAtPath:[FilePath stringByAppendingPathComponent:@"Crash"]];
+    [DWFileManager clearDirectoryAtPath:[FilePath stringByAppendingPathComponent:@"Crash"]];
 }
 
 +(void)removeCurrentLogBackUp {
-    [DWFileManager dw_RemoveItemAtPath:[DWLogManager shareLogManager].logFilePath];
+    [DWFileManager removeItemAtPath:[DWLogManager shareLogManager].logFilePath];
 }
 
 +(void)setupLogView:(id)logView {
@@ -263,7 +263,7 @@ static DWLogManager * mgr = nil;
 
 -(NSString *)projectName {
     if (!_projectName) {
-        _projectName = [UIDevice dw_ProjectDisplayName];
+        _projectName = [UIDevice dw_projectDisplayName];
     }
     return _projectName;
 }

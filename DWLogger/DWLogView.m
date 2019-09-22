@@ -8,8 +8,8 @@
 
 #import "DWLogView.h"
 #import <DWCheckBox/DWCheckBox.h>
+#import <DWKit/NSArray+DWArrayUtils.h>
 #import "DWLogger.h"
-#import "NSArray+DWArrayUtils.h"
 #import "DWSearchView.h"
 
 ///主线程取值
@@ -751,13 +751,13 @@ static DWLogView * loggerView = nil;
 }
 
 +(NSMutableArray *)filterDataArr:(NSArray <DWLogModel *>*)dataArr filter:(DWLoggerFilter)filter {
-    return [[dataArr dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
+    return [[dataArr dw_filteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
         return obj.filter & filter;
     }] mutableCopy];
 }
 
 +(NSMutableArray *)filterAllArr:(NSArray <DWLogModel *>*)allArr {
-    return [[allArr dw_FilteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
+    return [[allArr dw_filteredArrayUsingFilter:^BOOL(DWLogModel * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
         return obj.filter == DWLoggerAll;
     }] mutableCopy];
 }

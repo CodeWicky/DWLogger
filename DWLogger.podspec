@@ -14,27 +14,8 @@ s.frameworks = 'UIKit'
 
 s.dependency 'DWTableViewHelper'
 s.dependency 'DWCheckBox'
-
-s.subspec 'Dependence' do |d|
-
-d.subspec 'DWFileManager' do |ss|
-ss.source_files = 'DWLogger/**/DWFileManager.{h,m}'
-ss.public_header_files = 'DWLogger/**/DWFileManager.h'
-ss.frameworks = 'UIKit'
-end
-
-d.subspec 'DWArrayUtils' do |ss|
-ss.source_files = 'DWLogger/**/NSArray+DWArrayUtils.{h,m}'
-ss.public_header_files = 'DWLogger/**/NSArray+DWArrayUtils.h'
-ss.frameworks = 'UIKit'
-end
-
-d.subspec 'DWDeviceUtils' do |ss|
-ss.source_files = 'DWLogger/**/UIDevice+DWDeviceUtils.{h,m}'
-ss.public_header_files = 'DWLogger/**/UIDevice+DWDeviceUtils.h'
-ss.frameworks = 'UIKit'
-end
-
-end
+s.dependency 'DWKit/DWCategory/DWArrayUtils'
+s.dependency 'DWKit/DWCategory/DWDeviceUtils'
+s.dependency 'DWKit/DWUtils/DWFileManager'
 
 end

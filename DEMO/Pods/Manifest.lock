@@ -1,27 +1,19 @@
 PODS:
   - DWCheckBox (1.1.1)
-  - DWKit/DWUtils/DWOperationCancelFlag (0.0.0.4)
+  - DWKit/DWCategory/DWArrayUtils (0.0.0.7)
+  - DWKit/DWCategory/DWDeviceUtils (0.0.0.7)
+  - DWKit/DWUtils/DWFileManager (0.0.0.7)
+  - DWKit/DWUtils/DWOperationCancelFlag (0.0.0.7)
+  - DWKit/DWUtils/DWTransaction (0.0.0.7)
   - DWLogger (1.0.8.3):
     - DWCheckBox
-    - DWLogger/Dependence (= 1.0.8.3)
+    - DWKit/DWCategory/DWArrayUtils
+    - DWKit/DWCategory/DWDeviceUtils
+    - DWKit/DWUtils/DWFileManager
     - DWTableViewHelper
-  - DWLogger/Dependence (1.0.8.3):
-    - DWCheckBox
-    - DWLogger/Dependence/DWArrayUtils (= 1.0.8.3)
-    - DWLogger/Dependence/DWDeviceUtils (= 1.0.8.3)
-    - DWLogger/Dependence/DWFileManager (= 1.0.8.3)
-    - DWTableViewHelper
-  - DWLogger/Dependence/DWArrayUtils (1.0.8.3):
-    - DWCheckBox
-    - DWTableViewHelper
-  - DWLogger/Dependence/DWDeviceUtils (1.0.8.3):
-    - DWCheckBox
-    - DWTableViewHelper
-  - DWLogger/Dependence/DWFileManager (1.0.8.3):
-    - DWCheckBox
-    - DWTableViewHelper
-  - DWTableViewHelper (1.1.7.5.1):
+  - DWTableViewHelper (1.1.7.5.2):
     - DWKit/DWUtils/DWOperationCancelFlag
+    - DWKit/DWUtils/DWTransaction
 
 DEPENDENCIES:
   - DWLogger (from `../`)
@@ -38,9 +30,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   DWCheckBox: 349e0671fdb7291cc5b0aa1554ca9084a8fd48d9
-  DWKit: d7c2414cee5b1a262083c3a8254f79cfa5707941
-  DWLogger: 19f475aa40456c99307543b96c54cc222d539f2c
-  DWTableViewHelper: 38ed900d37b889ce46770b33d43847be4597206d
+  DWKit: 7a032ebc700253bac71fa9d4b54f5b45ab5ef4fb
+  DWLogger: c370b35036469794635d74ea1337d55dcf8942fe
+  DWTableViewHelper: d4d9b004c3a9620dcabf6628b5c77db6d881e76c
 
 PODFILE CHECKSUM: fb57397cde8257bbb934fa8067fd369a6f97ec28
 
