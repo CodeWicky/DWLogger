@@ -10,7 +10,7 @@
 #include <execinfo.h>
 #import <UIKit/UIKit.h>
 #import <DWKit/UIDevice+DWDeviceUtils.h>
-#import "DWFileManager.h"
+#import <DWKit/DWFileManager.h>
 
 volatile int32_t UncaughtExceptionCount = 0;
 
