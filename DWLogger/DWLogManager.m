@@ -9,9 +9,9 @@
 #import "DWLogManager.h"
 #import <DWKit/DWFileManager.h>
 #import <DWKit/UIDevice+DWDeviceUtils.h>
+#import <DWCrashCollector/DWCrashCollector.h>
 #import "DWLogger.h"
 #import "DWLogView.h"
-#import "DWCrashCollector.h"
 #import "UIWindow+DWLoggerShake.h"
 
 NSNotificationName const DWLoggerDeviceShakeNotification = @"DWLoggerDeviceShakeNotification";
