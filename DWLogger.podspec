@@ -14,6 +14,7 @@ s.frameworks = 'UIKit'
 
 s.dependency 'DWTableViewHelper'
 s.dependency 'DWCheckBox'
+s.dependency 'DWCrashCollector'
 s.dependency 'DWKit/DWCategory/DWArrayUtils'
 s.dependency 'DWKit/DWCategory/DWDeviceUtils'
 s.dependency 'DWKit/DWUtils/DWFileManager'

@@ -26,7 +26,7 @@
 
 typedef void(^ExceptionHandlerType)(NSException * exc);
 
-@interface DWCrashCollector : NSObject<UIAlertViewDelegate>
+@interface DWCrashCollector : NSObject
 
 ///自定义崩溃如何处理
 +(void)configToCollectCrashWithSavePath:(NSString *)savePath handler:(ExceptionHandlerType)handler;

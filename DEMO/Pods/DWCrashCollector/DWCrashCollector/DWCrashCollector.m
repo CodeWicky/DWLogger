@@ -26,7 +26,7 @@ static dispatch_queue_t serialQ = nil;
 
 +(void)collectCrashInDefaultWithSavePath:(NSString *)savePath {
     if (!savePath.length) {
-        savePath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:@"DWLogger"];
+        savePath = [[DWFileManager cachesDir] stringByAppendingPathComponent:@"DWCrashCollector"];
     }
     [self configToCollectCrashWithSavePath:savePath handler:[self defaultHandler]];
 }

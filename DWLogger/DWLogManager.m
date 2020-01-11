@@ -16,7 +16,7 @@
 
 NSNotificationName const DWLoggerDeviceShakeNotification = @"DWLoggerDeviceShakeNotification";
 
-#define FilePath [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:@"DWLogger"]
+#define FilePath [[DWFileManager cachesDir] stringByAppendingPathComponent:@"DWLogger"]
 
 #define NSRangeNull NSMakeRange(MAXFLOAT, MAXFLOAT)
 

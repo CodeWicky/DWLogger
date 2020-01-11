@@ -1,5 +1,8 @@
 PODS:
   - DWCheckBox (1.1.1)
+  - DWCrashCollector (0.0.0.1):
+    - DWKit/DWCategory/DWDeviceUtils
+    - DWKit/DWUtils/DWFileManager
   - DWKit/DWCategory/DWArrayUtils (0.0.0.7)
   - DWKit/DWCategory/DWDeviceUtils (0.0.0.7)
   - DWKit/DWUtils/DWFileManager (0.0.0.7)
@@ -7,6 +10,7 @@ PODS:
   - DWKit/DWUtils/DWTransaction (0.0.0.7)
   - DWLogger (1.0.8.3):
     - DWCheckBox
+    - DWCrashCollector
     - DWKit/DWCategory/DWArrayUtils
     - DWKit/DWCategory/DWDeviceUtils
     - DWKit/DWUtils/DWFileManager
@@ -21,6 +25,7 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - DWCheckBox
+    - DWCrashCollector
     - DWKit
     - DWTableViewHelper
 
@@ -30,8 +35,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   DWCheckBox: 349e0671fdb7291cc5b0aa1554ca9084a8fd48d9
+  DWCrashCollector: f648d9e85560b088cf92bc9347a52d4c05302080
   DWKit: 7a032ebc700253bac71fa9d4b54f5b45ab5ef4fb
-  DWLogger: c370b35036469794635d74ea1337d55dcf8942fe
+  DWLogger: 80cbdb5a78eb0865db9da7a1319b1b912e31cda6
   DWTableViewHelper: d4d9b004c3a9620dcabf6628b5c77db6d881e76c
 
 PODFILE CHECKSUM: fb57397cde8257bbb934fa8067fd369a6f97ec28
