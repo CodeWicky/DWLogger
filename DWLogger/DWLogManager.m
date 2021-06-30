@@ -96,12 +96,12 @@ static DWLogManager * mgr = nil;
         dispatch_once(&onceToken, ^{
             logger.updateLogQueue = dispatch_queue_create("com.updateLogQueue.DWLogManager", DISPATCH_QUEUE_SERIAL);
         });
-        dispatch_sync(logger.updateLogQueue, ^{
+        dispatch_async(logger.updateLogQueue, ^{
             [[DWLogManager shareLogManager].logArr addObject:model];
+            if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
+                [DWLogView updateLog:model filter:filter];
+            }
         });
-        if (([DWLogManager shareLogManager].logFilter & DWLoggerAll) && (filter != DWLoggerIgnore)) {
-            [DWLogView updateLog:model filter:filter];
-        }
     }
     if (logger.autoBackUp && logger.saveLocalLog) {
         static dispatch_once_t onceToken;
