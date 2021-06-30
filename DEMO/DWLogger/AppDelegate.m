@@ -17,7 +17,7 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+    aaa
     [DWLogManager configDefaultLogger];
     [DWLogManager shareLogManager].saveLocalLog = NO;
     [DWLogManager configToCollectCrash];
